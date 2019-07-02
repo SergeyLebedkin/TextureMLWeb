@@ -7,82 +7,104 @@
 </head>
 
 <body>
+    <!-- top panel -->
+    <div class="top-panel">
+    </div>
     <div class="main-panel">
         <!-- left panel -->
         <div class="left-panel">
-            <button id="buttonLoadImageFile">Load image</button>
-            <input type="file" id="inputImageFile" style="display:none">
+            <!-- Connection  -->
+            <div class="menu-item-title">Connection</div>
             <div class="bordered-panel">
                 <div class="row-panel">
-                    <a style="width: 100px">Mouse mode:</a>
-                    <input type="radio" id="radioDraw" name="MouseMode" checked>
-                    <a style="width: 90px">Draw</a>
-                    <input type="radio" id="radioDrag" name="MouseMode">
-                    <a style="width: 90px">Drag</a>
+                    <label style="width: 90px">Username:</label>
+                    <input id="inputUsername" type="text" style="width: 180px" />
                 </div>
                 <div class="row-panel">
-                    <a style="width: 100px">Draw mode:</a>
-                    <input type="radio" id="radioArea" name="DrawMode" checked>
-                    <a style="width: 90px">Polygon</a>
-                    <input type="radio" id="radioRect" name="DrawMode">
-                    <a style="width: 90px">Rect</a>
+                    <label style="width: 90px">Session ID:</label>
+                    <input id="inputSessionID" type="text" style="width: 180px" readonly />
                 </div>
                 <div class="row-panel">
-                    <a style="width: 100px">Select area:</a>
-                    <input type="radio" id="radioInclude" name="ColorMap"checked>
-                    <a style="width: 90px">Include</a>
-                    <input type="radio" id="radioExclude" name="ColorMap">
-                    <a style="width: 90px">Exclude</a>
+                    <label style="width: 90px">Description:</label>
+                    <input id="inputDescription" type="text" style="width: 180px" />
                 </div>
             </div>
-            <select id="selectImages" onchange="selectImagesOnChange()"></select>
-            <div class="row-panel">
-                <a style="width: 130px">Image dims (px):</a>                
-                <a>x: </a>
-                <input type="text" readonly id="inputImageDimXpx" style="width: 60px">
-                <a style="width: 15px"></a>
-                <a>y: </a>
-                <input type="text" readonly id="inputImageDimYpx" style="width: 60px">
+            <!-- 1. Open files -->
+            <div class="menu-item-title">1. Open files</div>
+            <div class="bordered-panel">
+                <button id="buttonLoadImages" class="left-panel-button">Load Images</button>
+                <input type="file" id="imputLoadImages" multiple name="files[]" style="display:none">
             </div>
-            <div class="row-panel">
-                <a style="width: 130px">Image dims (mm):</a>                
-                <a>x: </a>
-                <input type="text" readonly id="inputImageDimXmm" style="width: 60px">
-                <a style="width: 15px"></a>
-                <a>y: </a>
-                <input type="text" readonly id="inputImageDimYmm" style="width: 60px">
-            </div>
-            <div class="row-panel">
-                <a style="width: 130px">Image resolution:</a>
-                <input type="text" readonly id="inputImageResmm" style="width: 90px">
-                <a style="width: 30px">[mm]</a>
-            </div>
-            <div id="histogram_panel">
-                <div id="histogram_canvas_panel">
+            <!-- 2a. Image view -->
+            <div class="menu-item-title">2a. Image view</div>
+            <div class="bordered-panel">
+                <!-- Image Number -->
+                <a>Image Number:</a><br />
+                <select style="width: 100%" id="selectImageNumber">
+                </select>
+                <!-- Colormap switcher -->
+                <div class="row-panel">
+                    <a style="width: 90px">Colormap:</a>
+                    <input type="radio" id="radioGrayScale" name="ColorMap" checked>
+                    <a style="width: 90px">Gray scale</a>
+                    <input type="radio" id="radioColorMapJet" name="ColorMap">
+                    <a>JET</a>
                 </div>
-                <div class="bordered-panel">
-                    <div class="row-panel">
-                        <a style="width: 100px">Intensity LOW</a>
-                        <input type="range" id="rangeIntensityLow" min="0" max="255" value="90" style="width:100%"/>
-                        <input type="text" id="textIntensityLow" style="width: 25px" readonly/>
-                    </div>
-                    <div class="row-panel">
-                        <a style="width: 100px">Intensity MEDIUM</a>
-                        <input type="range" id="rangeIntensityMedium" min="0" max="255" value="150" style="width:100%"/>
-                        <input type="text" id="textIntensityMedium" style="width: 25px" readonly/>
-                    </div>
-                    <div class="row-panel">
-                        <a style="width: 100px">Intensity HI</a>
-                        <input type="range" id="rangeIntensityHigh" min="0" max="255" value="250" style="width:100%"/>
-                        <input type="text" id="textIntensityHigh" style="width: 25px" readonly/>
-                    </div>
+                <hr>
+                <!-- Region source switcher -->
+                <div class="row-panel">
+                    <a style="width: 90px">Regions:</a>
+                    <input type="radio" id="radioManual" name="regionSource" checked>
+                    <a style="width: 90px">Created</a>
+                    <input type="radio" id="radioLoaded" name="regionSource">
+                    <a>Loaded</a>
+                </div>
+                <hr>
+                <!-- View mode switcher -->
+                <div class="row-panel">
+                    <a style="width: 90px">View mode:</a>
+                    <input type="radio" id="radioEdit" name="imagePreview" checked>
+                    <a style="width: 90px">Edit</a>
+                    <input type="radio" id="radioPreview" name="imagePreview">
+                    <a>Preview</a>
                 </div>
             </div>
-            <div>
-                <input type="checkbox" id="checkboxShowOriginal" name="checkboxShowOriginal">
-                <label for="checkboxShowOriginal">Show original image</label>
+            <!-- 2b. Assign Visual Signature -->
+            <div class="menu-item-title">2b. Assign Visual Signature</div>
+            <div class="bordered-panel">
+                <!-- Selection mode switcher -->
+                <a>Selection mode:</a>
+                <input type="radio" id="radioSetectionModeAdd" name="SetectionMode" checked>
+                <label>Add</label>
+                <input type="radio" id="radioSetectionModeRemove" name="SetectionMode">
+                <label>Remove</label>
+                <hr>
+                <!-- TextureID list selector -->
+                <a>Select ID:</a>
+                <div id="texture_id_list_container">
+                    this is a texture_id_list_container
+                </div>
+                <!-- add new TextureID -->
+                <button id="buttonAddTextureID">+</button>
             </div>
-            <button id="buttonSaveFabrics">Save Fabrics</button>
+            <!-- Submit -->
+            <div class="menu-item-title">3. Submit</div>
+            <div class="bordered-panel">
+                <button id="buttonSubmit" class="left-panel-button">Submit</button>
+            </div>
+            <!-- Load regions -->
+            <div class="menu-item-title">4. Load regions</div>
+            <div class="bordered-panel">
+                <button id="buttonLoadRegions" class="left-panel-button">Load regions</button>
+                <hr>
+                <button  id="buttonLoadCurves" class="left-panel-button">Load curves</button>
+                <input type="file" id="invisible_text_file_input" name="files[]" style="display:none">
+            </div>
+            <div class="row-panel">
+                <div class="menu-item-title">Result ID: </div>
+                <label id="labelResultID" class="menu-item-title" id="resultID">0</label>
+            </div>
+            <input type="range" id="inputSourceIndex" min=" 0" max="0" style="width:100%" />
         </div>
         <!-- center panel -->
         <div class="center-panel">
@@ -95,9 +117,11 @@
                 </div>
                 <!-- editor -->
                 <div id="image_canvas_panel">
-                    <!-- content will be created programmaticaly -->
                 </div>
             </div>
+        </div>
+        <!-- right-panel -->
+        <div class="right-panel">
         </div>
     </div>
     <script type="text/javascript" src="<%= htmlWebpackPlugin.files.chunks.index.entry %>"></script>
