@@ -4,10 +4,10 @@ import { CurvePoint } from "./CurvePoint"
 export class Curve {
     // fields
     public color: string = "red";
-    public points: Array<CurvePoint> = null;
+    public points: Array<CurvePoint> = [];
     // constructor
     constructor() {
         this.color = "red";
-        this.points = new Array<CurvePoint>();
+        this.points = [];
     }
 }
