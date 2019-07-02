@@ -1,3 +1,8 @@
+import { ImageInfo } from "./TextureML/Types/ImageInfo";
+
+// globals
+let gImageInfos: Array<ImageInfo> = new Array<ImageInfo>();
+
 // window.onload
 window.onload = event => {
     // get elements - left panel
