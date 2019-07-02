@@ -74,9 +74,9 @@
             <div class="bordered-panel">
                 <!-- Selection mode switcher -->
                 <a>Selection mode:</a>
-                <input type="radio" id="radioSetectionModeAdd" name="SetectionMode" checked>
+                <input type="radio" id="radioSelectionModeAdd" name="SetectionMode" checked>
                 <label>Add</label>
-                <input type="radio" id="radioSetectionModeRemove" name="SetectionMode">
+                <input type="radio" id="radioSelectionModeRemove" name="SetectionMode">
                 <label>Remove</label>
                 <hr>
                 <!-- TextureID list selector -->
@@ -111,9 +111,9 @@
             <div id="image_editor" class="center-panel">
                 <!-- -/+ scale buttons -->
                 <div style="flex-direction: row; text-align: center">
-                    <button id="buttonScaleDown">-</button>
-                    <button id="buttonScaleUp">+</button>
-                    <a id="scaleFactor">100%</a>
+                    <button id="buttonScaleDown" style="width: 30px">-</button>
+                    <button id="buttonScaleUp" style="width: 30px">+</button>
+                    <label id="labelScaleFactor">100%</label>
                 </div>
                 <!-- editor -->
                 <div id="image_canvas_panel">

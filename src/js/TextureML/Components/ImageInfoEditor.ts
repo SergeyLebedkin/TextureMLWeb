@@ -18,7 +18,7 @@ export class ImageInfoEditor {
     // region info source
     public regionInfoSource: RegionInfoSource = RegionInfoSource.MANUAL;
     // scale
-    private scale: number = 1.0;
+    public scale: number = 1.0;
     // selection
     private selectionStarted: boolean = false;
     private selectionMode: SelectionMode = SelectionMode.ADD;
@@ -131,8 +131,8 @@ export class ImageInfoEditor {
             this.selectionStarted = true;
             // check selection mode and set color
             if (this.selectionMode === SelectionMode.ADD) {
-                this.selectionRegionInfo.ID = this.textureID.ID;
-                this.selectionRegionInfo.color = this.textureID.color;
+                //this.selectionRegionInfo.ID = this.textureID.ID;
+                //this.selectionRegionInfo.color = this.textureID.color;
             } else if (this.selectionMode === SelectionMode.REMOVE) {
                 this.selectionRegionInfo.color = "#FF0000";
             }
@@ -160,6 +160,24 @@ export class ImageInfoEditor {
             if (region.checkIntersectionRegion(regionInfo))
                 this.imageInfo.regionsManual.splice(i, 1);
         }
+    }
+
+    // setColorMapType
+    public setColorMapType(colorMapType: ColorMapType): void {
+        this.colorMapType = colorMapType;
+        this.drawImageInfo();
+    }
+
+    // setRegionInfoSource
+    public setRegionInfoSource(regionInfoSource: RegionInfoSource): void {
+        this.regionInfoSource = regionInfoSource;
+        this.drawImageInfo();
+    }
+
+    // setSelectionMode
+    public setSelectionMode(selectionMode: SelectionMode): void {
+        this.selectionMode = selectionMode;
+        this.drawImageInfo();
     }
 
     // setTextureID
@@ -203,13 +221,24 @@ export class ImageInfoEditor {
     public drawImageInfoRegions(): void {
         // check for null
         if (this.imageInfo === null) return;
-        // draw all regions
-        for (let region of this.imageInfo.regionsManual) {
-            this.imageCanvasCtx.globalAlpha = 0.5;
-            this.imageCanvasCtx.fillStyle = region.color;
-            this.imageCanvasCtx.fillRect(region.x * this.scale, region.y * this.scale, region.w * this.scale, region.h * this.scale);
-            this.imageCanvasCtx.globalAlpha = 1.0;
+        // draw manual regions
+        if (this.regionInfoSource === RegionInfoSource.MANUAL) {
+            for (let region of this.imageInfo.regionsManual) {
+                this.imageCanvasCtx.globalAlpha = 0.5;
+                this.imageCanvasCtx.fillStyle = region.color;
+                this.imageCanvasCtx.fillRect(region.x * this.scale, region.y * this.scale, region.w * this.scale, region.h * this.scale);
+                this.imageCanvasCtx.globalAlpha = 1.0;
+            }
         }
+        // draw loaded regions
+        if (this.regionInfoSource === RegionInfoSource.LOADED) {
+            for (let region of this.imageInfo.regionsLoaded) {
+                this.imageCanvasCtx.globalAlpha = 0.5;
+                this.imageCanvasCtx.fillStyle = region.color;
+                this.imageCanvasCtx.fillRect(region.x * this.scale, region.y * this.scale, region.w * this.scale, region.h * this.scale);
+                this.imageCanvasCtx.globalAlpha = 1.0;
+            }
+        };
     }
 
     // drawImageInfo
