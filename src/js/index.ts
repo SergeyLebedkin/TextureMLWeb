@@ -9,6 +9,7 @@ let inputUsername: HTMLInputElement = null;
 let inputSessionID: HTMLInputElement = null;
 let inputDescription: HTMLInputElement = null;
 let buttonLoadImages: HTMLButtonElement = null;
+let inputLoadImages: HTMLInputElement = null;
 let selectImageNumber: HTMLSelectElement = null;
 let radioGrayScale: HTMLInputElement = null;
 let radioColorMapJet: HTMLInputElement = null;
@@ -35,6 +36,25 @@ let gSessionInfo: SessionInfo = null;
 // components
 let gImageInfoEditor: ImageInfoEditor = null;
 
+// buttonLoadImagesOnClick
+function buttonLoadImagesOnClick(event: MouseEvent) {
+    inputLoadImages.accept = ".png,.jpg";
+    inputLoadImages.onchange = event => {
+        let files: Array<File> = event.currentTarget["files"];
+        for (let file of files) {
+            let imageInfo = new ImageInfo();
+            imageInfo.onloadImageFile = imageInfo => {
+                // add image info
+                gImageInfoList.push(imageInfo);
+                if (gImageInfoEditor.imageInfo === null)
+                    gImageInfoEditor.setImageInfo(imageInfo);
+            }
+            imageInfo.loadImageFromFile(file);
+        }
+    }
+    inputLoadImages.click();
+}
+
 // window.onload
 window.onload = event => {
     // get elements - left panel
@@ -43,6 +63,7 @@ window.onload = event => {
     inputSessionID = document.getElementById("inputSessionID") as HTMLInputElement;
     inputDescription = document.getElementById("inputDescription") as HTMLInputElement;
     buttonLoadImages = document.getElementById("buttonLoadImages") as HTMLButtonElement;
+    inputLoadImages = document.getElementById("inputLoadImages") as HTMLInputElement;
     selectImageNumber = document.getElementById("selectImageNumber") as HTMLSelectElement;
     radioGrayScale = document.getElementById("radioGrayScale") as HTMLInputElement;
     radioColorMapJet = document.getElementById("radioColorMapJet") as HTMLInputElement;
@@ -75,6 +96,10 @@ window.onload = event => {
     inputSessionID.value = gSessionInfo.sessionID;
 
     // set events
+    buttonLoadImages.onclick = event => buttonLoadImagesOnClick(event);
+    divImageInfoPanel.onmouseup = event => gImageInfoEditor.onMouseUp(event);
+    divImageInfoPanel.onmousemove = event => gImageInfoEditor.onMouseMove(event);
+    divImageInfoPanel.onmousedown = event => gImageInfoEditor.onMouseDown(event);
     inputUsername.oninput = event => gSessionInfo.username = inputUsername.value;
     inputDescription.oninput = event => gSessionInfo.description = inputDescription.value;
     buttonScaleDown.onclick = event => console.log("buttonScaleDown on click");
