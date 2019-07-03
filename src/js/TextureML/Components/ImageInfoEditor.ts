@@ -100,9 +100,11 @@ export class ImageInfoEditor {
                 }
             };
             // remove regions from list
-            if (this.selectionMode === SelectionMode.REMOVE)
+            if (this.selectionMode === SelectionMode.REMOVE) {
                 this.removeRegionsInArea(this.selectionRegionInfo);
-
+                if (this.onchangedImageInfo)
+                    this.onchangedImageInfo(this.imageInfo);
+            }
             // redraw all stuff
             this.drawImageInfo();
         }

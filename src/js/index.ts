@@ -8,6 +8,7 @@ import { SelectionMode } from "./TextureML/Types/SelectionMode";
 import { RegionInfo } from "./TextureML/Types/RegionInfo";
 import { TextureIDListView } from "./TextureML/Components/TextureIDListViewer";
 import { ImageInfoListViewer } from "./TextureML/Components/ImageInfoListViewer";
+import { RegionInfosViewer } from "./TextureML/Components/RegionInfosViewer";
 
 // get elements - left panel
 let divImageInfoPanel: HTMLDivElement = null;
@@ -37,6 +38,9 @@ let inputSourceIndex: HTMLInputElement = null;
 let labelScaleFactor: HTMLLabelElement = null;
 let buttonScaleDown: HTMLButtonElement = null;
 let buttonScaleUp: HTMLButtonElement = null;
+// get elements - right panel
+let selectTextureID: HTMLSelectElement = null;
+let divRegionInfosListViewer: HTMLDivElement = null;
 
 // globals
 let gImageInfoList: Array<ImageInfo> = null;
@@ -47,6 +51,7 @@ let gSessionInfo: SessionInfo = null;
 let gImageInfoEditor: ImageInfoEditor = null;
 let gImageInfoListViewer: ImageInfoListViewer = null;
 let gTextureIDListView: TextureIDListView = null;
+let gRegionInfosViewer: RegionInfosViewer = null;
 
 // selectImageNumberUpdate
 function selectImageNumberUpdate() {
@@ -65,6 +70,30 @@ function selectImageNumberUpdate() {
     // set selected index
     if ((selectedIndex < 0) && (gImageInfoList.length > 0)) selectedIndex = 0;
     selectImageNumber.selectedIndex = selectedIndex;
+}
+
+// selectTextureIDUpdate
+function selectTextureIDUpdate() {
+    // get selected index
+    var selectedIndex = selectTextureID.selectedIndex;
+    // clear childs
+    while (selectTextureID.firstChild) { selectTextureID.removeChild(selectTextureID.firstChild); }
+
+    // add items
+    for (let textureID of gTextureIDList) {
+        // create new selector
+        let textureIDOption = document.createElement('option');
+        textureIDOption["textureID"] = textureID;
+        textureIDOption.innerHTML = textureID.ID + ": " + textureID.name;
+        selectTextureID.appendChild(textureIDOption);
+    }
+    // set selected value
+    if ((selectedIndex < 0) && (gTextureIDList.length > 0)) {
+        selectTextureID.selectedIndex = 0;
+        gRegionInfosViewer.setTextureID(gTextureIDList[selectTextureID.selectedIndex])
+    } else {
+        selectTextureID.selectedIndex = selectedIndex;
+    }
 }
 
 // buttonLoadImagesOnClick
@@ -92,6 +121,32 @@ function selectImageNumberOnChange(event) {
     gImageInfoEditor.setImageInfo(gImageInfoList[selectImageNumber.selectedIndex]);
 }
 
+// radioGrayScaleOnChange
+function radioGrayScaleOnChange(event) {
+    gImageInfoEditor.setColorMapType(ColorMapType.GRAY_SCALE);
+    gImageInfoListViewer.setColorMapType(ColorMapType.GRAY_SCALE);
+    gRegionInfosViewer.setColorMapType(ColorMapType.GRAY_SCALE);
+};
+
+// radioColorMapJetOnChange
+function radioColorMapJetOnChange(event) {
+    gImageInfoEditor.setColorMapType(ColorMapType.JET);
+    gImageInfoListViewer.setColorMapType(ColorMapType.JET);
+    gRegionInfosViewer.setColorMapType(ColorMapType.JET);
+};
+
+// radioManualOnChange
+function radioManualOnChange(event) {
+    gImageInfoEditor.setRegionInfoSource(RegionInfoSource.MANUAL);
+    gRegionInfosViewer.setRegionInfoSource(RegionInfoSource.MANUAL);
+}
+
+// radioLoadedOnChange
+function radioLoadedOnChange(event) {
+    gImageInfoEditor.setRegionInfoSource(RegionInfoSource.LOADED);
+    gRegionInfosViewer.setRegionInfoSource(RegionInfoSource.LOADED);
+}
+
 // radioEditOnChange
 function radioEditOnChange(event) {
     divImageInfoPanel.style.display = "block";
@@ -108,10 +163,11 @@ function radioPreviewOnChange(event) {
 
 // buttonAddTextureIDOnClick
 function buttonAddTextureIDOnClick(event) {
-    var id = nextChar(gTextureIDList[gTextureIDList.length - 1].ID);
-    var color = generateRandomColor();
+    let id = nextChar(gTextureIDList[gTextureIDList.length - 1].ID);
+    let color = generateRandomColor();
     gTextureIDList.push(new TextureID(id, color));
     gTextureIDListView.update();
+    selectTextureIDUpdate();
 }
 
 // buttonLoadRegionsOnClick
@@ -192,6 +248,9 @@ window.onload = event => {
     labelScaleFactor = document.getElementById("labelScaleFactor") as HTMLLabelElement;
     buttonScaleDown = document.getElementById("buttonScaleDown") as HTMLButtonElement;
     buttonScaleUp = document.getElementById("buttonScaleUp") as HTMLButtonElement;
+    // get elements - right panel
+    selectTextureID = document.getElementById("selectTextureID") as HTMLSelectElement;
+    divRegionInfosListViewer = document.getElementById("region_preview") as HTMLDivElement;
 
     // create global objects
     gImageInfoList = new Array<ImageInfo>();
@@ -222,7 +281,7 @@ window.onload = event => {
 
     // create image info editor
     gImageInfoEditor = new ImageInfoEditor(divImageInfoPanel);
-    gImageInfoEditor.onchangedImageInfo = imageInfo => console.log(imageInfo.fileRef.name);
+    gImageInfoEditor.onchangedImageInfo = imageInfo => gRegionInfosViewer.update();
     gImageInfoEditor.setTextureID(gTextureIDList[0]);
     // create image info list viewer
     gImageInfoListViewer = new ImageInfoListViewer(divImageInfoPreviewPanel, gImageInfoList);
@@ -230,7 +289,12 @@ window.onload = event => {
     // create texture ID list viewer
     gTextureIDListView = new TextureIDListView(divTextureIDListContainer, gTextureIDList);
     gTextureIDListView.onchangedTextureID = textureID => gImageInfoEditor.setTextureID(textureID);
-    gTextureIDListView.onchangedDescription = textureID => console.log(textureID);
+    gTextureIDListView.onchangedDescription = textureID => selectTextureIDUpdate();
+    // create region infos viewer
+    gRegionInfosViewer = new RegionInfosViewer(divRegionInfosListViewer, gTextureIDList, gImageInfoList);
+    gRegionInfosViewer.setTextureID(gTextureIDList[0]);
+    // update
+    selectTextureIDUpdate();
 
     // init session
     inputSessionID.value = gSessionInfo.sessionID;
@@ -238,10 +302,10 @@ window.onload = event => {
     // left panel events
     buttonLoadImages.onclick = event => buttonLoadImagesOnClick(event);
     selectImageNumber.onchange = event => selectImageNumberOnChange(event);
-    radioGrayScale.onchange = event => { gImageInfoEditor.setColorMapType(ColorMapType.GRAY_SCALE); gImageInfoListViewer.setColorMapType(ColorMapType.GRAY_SCALE); };
-    radioColorMapJet.onchange = event => { gImageInfoEditor.setColorMapType(ColorMapType.JET); gImageInfoListViewer.setColorMapType(ColorMapType.JET); };
-    radioManual.onchange = event => gImageInfoEditor.setRegionInfoSource(RegionInfoSource.MANUAL);
-    radioLoaded.onchange = event => gImageInfoEditor.setRegionInfoSource(RegionInfoSource.LOADED);
+    radioGrayScale.onchange = event => radioGrayScaleOnChange(event);
+    radioColorMapJet.onchange = event => radioColorMapJetOnChange(event);
+    radioManual.onchange = event => radioManualOnChange(event);
+    radioLoaded.onchange = event => radioLoadedOnChange(event);
     radioEdit.onchange = event => radioEditOnChange(event);
     radioPreview.onchange = event => radioPreviewOnChange(event);
     radioSelectionModeAdd.onchange = event => gImageInfoEditor.setSelectionMode(SelectionMode.ADD);
@@ -256,6 +320,8 @@ window.onload = event => {
     inputDescription.oninput = event => gSessionInfo.description = inputDescription.value;
     buttonScaleDown.onclick = event => buttonScaleDownOnClick(event);
     buttonScaleUp.onclick = event => buttonScaleUpOnClick(event);
+    // right panel events
+    selectTextureID.onchange = (event) => gRegionInfosViewer.setTextureID(selectTextureID.options[selectTextureID.selectedIndex]["textureID"]);
 }
 
 // generate random color
@@ -265,7 +331,7 @@ function generateRandomColor() {
     for (var i = 0; i < 6; i++) {
         color += letters[Math.floor(Math.random() * 16)];
     }
-    
+
     return color;
 }
 

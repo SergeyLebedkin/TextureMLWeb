@@ -97,7 +97,7 @@
             <div class="bordered-panel">
                 <button id="buttonLoadRegions" class="left-panel-button">Load regions</button>
                 <hr>
-                <button  id="buttonLoadCurves" class="left-panel-button">Load curves</button>
+                <button id="buttonLoadCurves" class="left-panel-button">Load curves</button>
                 <input type="file" id="inputLoadTextFiles" name="files[]" style="display:none">
             </div>
             <div class="row-panel">
@@ -124,6 +124,10 @@
         </div>
         <!-- right-panel -->
         <div class="right-panel">
+            <select id="selectTextureID"></select>
+            <div id="region_preview">
+                <!-- content will be created programmaticaly -->
+            </div>
         </div>
     </div>
     <script type="text/javascript" src="<%= htmlWebpackPlugin.files.chunks.index.entry %>"></script>

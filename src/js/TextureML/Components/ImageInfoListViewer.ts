@@ -43,7 +43,7 @@ export class ImageInfoListViewer {
     // redraw
     public update() {
         // just clear
-        while (this.parent.firstChild) 
+        while (this.parent.firstChild)
             this.parent.removeChild(this.parent.firstChild);
 
         // add all images to preview
@@ -58,13 +58,14 @@ export class ImageInfoListViewer {
         div.style.display = "flex";
         div.style.flexDirection = "column";
         div.style.padding = "5px";
-        div.style.border = "1px solid gray"
+        div.style.textAlign = "center";
 
         // add label
-        var fileNameLabel = document.createElement('a');
+        var fileNameLabel = document.createElement("label");
         fileNameLabel.innerText = imageInfo.fileRef.name;
         fileNameLabel.style.color = "white";
         fileNameLabel.style.fontSize = "16px";
+        fileNameLabel.style.textAlign = "center";
         div.appendChild(fileNameLabel);
 
         // get ratio
