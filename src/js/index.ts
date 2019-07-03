@@ -7,9 +7,11 @@ import { RegionInfoSource } from "./TextureML/Types/RegionInfoSource";
 import { SelectionMode } from "./TextureML/Types/SelectionMode";
 import { RegionInfo } from "./TextureML/Types/RegionInfo";
 import { TextureIDListView } from "./TextureML/Components/TextureIDListViewer";
+import { ImageInfoListViewer } from "./TextureML/Components/ImageInfoListViewer";
 
 // get elements - left panel
 let divImageInfoPanel: HTMLDivElement = null;
+let divImageInfoPreviewPanel: HTMLDivElement = null;
 let inputUsername: HTMLInputElement = null;
 let inputSessionID: HTMLInputElement = null;
 let inputDescription: HTMLInputElement = null;
@@ -43,6 +45,7 @@ let gSessionInfo: SessionInfo = null;
 
 // components
 let gImageInfoEditor: ImageInfoEditor = null;
+let gImageInfoListViewer: ImageInfoListViewer = null;
 let gTextureIDListView: TextureIDListView = null;
 
 // selectImageNumberUpdate
@@ -89,6 +92,28 @@ function selectImageNumberOnChange(event) {
     gImageInfoEditor.setImageInfo(gImageInfoList[selectImageNumber.selectedIndex]);
 }
 
+// radioEditOnChange
+function radioEditOnChange(event) {
+    divImageInfoPanel.style.display = "block";
+    divImageInfoPreviewPanel.style.display = "none";
+    gImageInfoEditor.drawImageInfo();
+}
+
+// radioPreviewOnChange
+function radioPreviewOnChange(event) {
+    divImageInfoPanel.style.display = "none";
+    divImageInfoPreviewPanel.style.display = "flex";
+    gImageInfoListViewer.update();
+}
+
+// buttonAddTextureIDOnClick
+function buttonAddTextureIDOnClick(event) {
+    var id = nextChar(gTextureIDList[gTextureIDList.length - 1].ID);
+    var color = generateRandomColor();
+    gTextureIDList.push(new TextureID(id, color));
+    gTextureIDListView.update();
+}
+
 // buttonLoadRegionsOnClick
 function buttonLoadRegionsOnClick(event) {
     inputLoadTextFiles.accept = '.txt';
@@ -101,21 +126,19 @@ function buttonLoadRegionsOnClick(event) {
                     if (str.length === 0) return;
                     let params: string[] = str.split(',');
                     params = params.map(param => param.trim());
-                    // add region to image info
-                    gImageInfoList.forEach(imageInfo => {
-                        if (imageInfo.fileRef.name === params[0]) {
-                            // add new region info 
-                            let regionInfo = new RegionInfo();
-                            let textureID = findOrDefaultTextureID(params[7]);
-                            regionInfo.ID = textureID.ID;
-                            regionInfo.color = textureID.color;
-                            regionInfo.x = parseFloat(params[1]);
-                            regionInfo.y = parseFloat(params[2]);
-                            regionInfo.w = parseFloat(params[4]) - parseFloat(params[1]);
-                            regionInfo.h = parseFloat(params[5]) - parseFloat(params[2]);
-                            imageInfo.regionsLoaded.push(regionInfo);
-                        }
-                    })
+                    // gey image info and texture id
+                    let imageInfo = gImageInfoList.find(imageInfo => imageInfo.fileRef.name === params[0]);
+                    let textureID = gTextureIDList.find(textureID => textureID.ID === params[7]);
+                    // add new region info 
+                    let regionInfo = new RegionInfo();
+                    regionInfo.ID = textureID ? textureID.ID : gTextureIDList[0].ID;
+                    regionInfo.color = textureID ? textureID.color : gTextureIDList[0].color;
+                    regionInfo.x = parseFloat(params[1]);
+                    regionInfo.y = parseFloat(params[2]);
+                    regionInfo.w = parseFloat(params[4]) - parseFloat(params[1]);
+                    regionInfo.h = parseFloat(params[5]) - parseFloat(params[2]);
+                    if (imageInfo)
+                        imageInfo.regionsLoaded.push(regionInfo);
                 });
                 gImageInfoEditor.drawImageInfo();
             }
@@ -128,12 +151,14 @@ function buttonLoadRegionsOnClick(event) {
 // buttonScaleDownOnClick
 function buttonScaleDownOnClick(event: MouseEvent) {
     gImageInfoEditor.setScale(gImageInfoEditor.scale / 2);
+    gImageInfoListViewer.setScale(gImageInfoListViewer.scale / 2);
     labelScaleFactor.innerText = Math.round(gImageInfoEditor.scale * 100) + "%";
 }
 
 // buttonScaleUpOnClick
 function buttonScaleUpOnClick(event: MouseEvent) {
     gImageInfoEditor.setScale(gImageInfoEditor.scale * 2);
+    gImageInfoListViewer.setScale(gImageInfoListViewer.scale * 2);
     labelScaleFactor.innerText = Math.round(gImageInfoEditor.scale * 100) + "%";
 }
 
@@ -141,6 +166,7 @@ function buttonScaleUpOnClick(event: MouseEvent) {
 window.onload = event => {
     // get elements - left panel
     divImageInfoPanel = document.getElementById("image_canvas_panel") as HTMLDivElement;
+    divImageInfoPreviewPanel = document.getElementById("image_preview_canvas_panel") as HTMLDivElement;
     inputUsername = document.getElementById("inputUsername") as HTMLInputElement;
     inputSessionID = document.getElementById("inputSessionID") as HTMLInputElement;
     inputDescription = document.getElementById("inputDescription") as HTMLInputElement;
@@ -198,23 +224,29 @@ window.onload = event => {
     gImageInfoEditor = new ImageInfoEditor(divImageInfoPanel);
     gImageInfoEditor.onchangedImageInfo = imageInfo => console.log(imageInfo.fileRef.name);
     gImageInfoEditor.setTextureID(gTextureIDList[0]);
-    //create texture ID list view
+    // create image info list viewer
+    gImageInfoListViewer = new ImageInfoListViewer(divImageInfoPreviewPanel, gImageInfoList);
+    divImageInfoPreviewPanel.style.display = "none";
+    // create texture ID list viewer
     gTextureIDListView = new TextureIDListView(divTextureIDListContainer, gTextureIDList);
     gTextureIDListView.onchangedTextureID = textureID => gImageInfoEditor.setTextureID(textureID);
     gTextureIDListView.onchangedDescription = textureID => console.log(textureID);
 
-    // init elements
+    // init session
     inputSessionID.value = gSessionInfo.sessionID;
 
     // left panel events
     buttonLoadImages.onclick = event => buttonLoadImagesOnClick(event);
     selectImageNumber.onchange = event => selectImageNumberOnChange(event);
-    radioGrayScale.onchange = event => gImageInfoEditor.setColorMapType(ColorMapType.GRAY_SCALE);
-    radioColorMapJet.onchange = event => gImageInfoEditor.setColorMapType(ColorMapType.JET);
+    radioGrayScale.onchange = event => { gImageInfoEditor.setColorMapType(ColorMapType.GRAY_SCALE); gImageInfoListViewer.setColorMapType(ColorMapType.GRAY_SCALE); };
+    radioColorMapJet.onchange = event => { gImageInfoEditor.setColorMapType(ColorMapType.JET); gImageInfoListViewer.setColorMapType(ColorMapType.JET); };
     radioManual.onchange = event => gImageInfoEditor.setRegionInfoSource(RegionInfoSource.MANUAL);
     radioLoaded.onchange = event => gImageInfoEditor.setRegionInfoSource(RegionInfoSource.LOADED);
+    radioEdit.onchange = event => radioEditOnChange(event);
+    radioPreview.onchange = event => radioPreviewOnChange(event);
     radioSelectionModeAdd.onchange = event => gImageInfoEditor.setSelectionMode(SelectionMode.ADD);
     radioSelectionModeRemove.onchange = event => gImageInfoEditor.setSelectionMode(SelectionMode.REMOVE);
+    buttonAddTextureID.onclick = event => buttonAddTextureIDOnClick(event);
     buttonLoadRegions.onclick = event => buttonLoadRegionsOnClick(event);
     // center panel events
     divImageInfoPanel.onmouseup = event => gImageInfoEditor.onMouseUp(event);
@@ -226,10 +258,18 @@ window.onload = event => {
     buttonScaleUp.onclick = event => buttonScaleUpOnClick(event);
 }
 
-// findOrDefaultTextureID
-function findOrDefaultTextureID(ID: string) {
-    for (let textureID of gTextureIDList)
-        if (textureID.ID === ID)
-            return textureID;
-    return gTextureIDList[0];
+// generate random color
+function generateRandomColor() {
+    var letters = '0123456789ABCDEF';
+    var color = '#';
+    for (var i = 0; i < 6; i++) {
+        color += letters[Math.floor(Math.random() * 16)];
+    }
+    
+    return color;
+}
+
+// next char
+function nextChar(c) {
+    return String.fromCharCode(c.charCodeAt(0) + 1);
 }

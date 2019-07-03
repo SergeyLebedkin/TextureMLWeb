@@ -55,7 +55,7 @@ export class TextureIDListView {
         var radios = document.getElementsByName('textureID');
         for (var i = 0, length = radios.length; i < length; i++) {
             if ((radios[i] as HTMLInputElement).checked) {
-                return (radios[i] as any).textureID;
+                return radios[i]["textureID"];
             }
         }
         return null;
