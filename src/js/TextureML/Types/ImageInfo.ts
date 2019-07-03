@@ -14,8 +14,6 @@ export class ImageInfo {
     public curves: Array<Curve> = [];
     // events
     public onloadImageFile: (this: ImageInfo, imageInfo: ImageInfo) => any = null;
-    public onloadRegionsFile: (this: ImageInfo, imageInfo: ImageInfo) => any = null;
-    public onloadCurvesFile: (this: ImageInfo, imageInfo: ImageInfo) => any = null;
 
     // constructor
     constructor() {
@@ -30,8 +28,6 @@ export class ImageInfo {
         this.curves = [];
         // events
         this.onloadImageFile = null;
-        this.onloadRegionsFile = null;
-        this.onloadCurvesFile = null;
     }
 
     // updateCanvasImageJet

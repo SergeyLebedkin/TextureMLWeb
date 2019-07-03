@@ -73,7 +73,7 @@ html, body {
     color: white;
 }
 
-#texture_id_list_container {
+#divTextureIDListContainer {
     max-height: 100px;
     overflow: auto;
 }

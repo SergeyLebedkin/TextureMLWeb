@@ -27,6 +27,7 @@ export class ImageInfoEditor {
     private colorMapType: ColorMapType = ColorMapType.GRAY_SCALE;
     // events
     public onchangedImageInfo: (this: ImageInfoEditor, imageInfo: ImageInfo) => any = null;
+
     // constructor
     constructor(parent: HTMLDivElement) {
         // parent
@@ -55,8 +56,6 @@ export class ImageInfoEditor {
     public onMouseUp(event: MouseEvent): void {
         // proceed selection
         if (this.selectionStarted) {
-            let mouseCoords = getMousePosByElement(this.imageCanvas, event);
-
             // celection region normalize and scale
             this.selectionRegionInfo.normalize();
             this.selectionRegionInfo.scale(1.0 / this.scale);
@@ -79,11 +78,15 @@ export class ImageInfoEditor {
                         (this.imageInfo.canvasImage.height < 200)) {
                         this.removeRegionsInArea(this.selectionRegionInfo);
                         this.imageInfo.regionsManual.push(regionInfo);
+                        if (this.onchangedImageInfo)
+                            this.onchangedImageInfo(this.imageInfo);
                     }
                     else // check size restrictions for regular images
                         if ((regionInfo.w > 100) && (regionInfo.h > 200)) {
                             this.removeRegionsInArea(this.selectionRegionInfo);
                             this.imageInfo.regionsManual.push(regionInfo);
+                            if (this.onchangedImageInfo)
+                                this.onchangedImageInfo(this.imageInfo);
                         }
                         else {
                             if ((regionInfo.w <= 100) && (regionInfo.h <= 200)) {
@@ -131,8 +134,10 @@ export class ImageInfoEditor {
             this.selectionStarted = true;
             // check selection mode and set color
             if (this.selectionMode === SelectionMode.ADD) {
-                //this.selectionRegionInfo.ID = this.textureID.ID;
-                //this.selectionRegionInfo.color = this.textureID.color;
+                if (this.textureID) {
+                    this.selectionRegionInfo.ID = this.textureID.ID;
+                    this.selectionRegionInfo.color = this.textureID.color;
+                }
             } else if (this.selectionMode === SelectionMode.REMOVE) {
                 this.selectionRegionInfo.color = "#FF0000";
             }

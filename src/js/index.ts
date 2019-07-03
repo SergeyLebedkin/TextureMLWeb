@@ -5,6 +5,8 @@ import { ImageInfoEditor } from "./TextureML/Components/ImageInfoEditor";
 import { ColorMapType } from "./TextureML/Types/ColorMapType";
 import { RegionInfoSource } from "./TextureML/Types/RegionInfoSource";
 import { SelectionMode } from "./TextureML/Types/SelectionMode";
+import { RegionInfo } from "./TextureML/Types/RegionInfo";
+import { TextureIDListView } from "./TextureML/Components/TextureIDListViewer";
 
 // get elements - left panel
 let divImageInfoPanel: HTMLDivElement = null;
@@ -22,10 +24,12 @@ let radioEdit: HTMLInputElement = null;
 let radioPreview: HTMLInputElement = null;
 let radioSelectionModeAdd: HTMLInputElement = null;
 let radioSelectionModeRemove: HTMLInputElement = null;
+let divTextureIDListContainer: HTMLDivElement = null;
 let buttonAddTextureID: HTMLInputElement = null;
 let buttonSubmit: HTMLButtonElement = null;
 let buttonLoadRegions: HTMLButtonElement = null;
 let buttonLoadCurves: HTMLButtonElement = null;
+let inputLoadTextFiles: HTMLInputElement = null;
 let inputSourceIndex: HTMLInputElement = null;
 // get elements - center panel
 let labelScaleFactor: HTMLLabelElement = null;
@@ -39,6 +43,7 @@ let gSessionInfo: SessionInfo = null;
 
 // components
 let gImageInfoEditor: ImageInfoEditor = null;
+let gTextureIDListView: TextureIDListView = null;
 
 // selectImageNumberUpdate
 function selectImageNumberUpdate() {
@@ -84,6 +89,42 @@ function selectImageNumberOnChange(event) {
     gImageInfoEditor.setImageInfo(gImageInfoList[selectImageNumber.selectedIndex]);
 }
 
+// buttonLoadRegionsOnClick
+function buttonLoadRegionsOnClick(event) {
+    inputLoadTextFiles.accept = '.txt';
+    inputLoadTextFiles.onchange = event => {
+        let files: Array<File> = event.currentTarget["files"];
+        for (let file of files) {
+            var fileReader = new FileReader();
+            fileReader.onload = event => {
+                event.target["result"].split('\n').forEach((str: string) => {
+                    if (str.length === 0) return;
+                    let params: string[] = str.split(',');
+                    params = params.map(param => param.trim());
+                    // add region to image info
+                    gImageInfoList.forEach(imageInfo => {
+                        if (imageInfo.fileRef.name === params[0]) {
+                            // add new region info 
+                            let regionInfo = new RegionInfo();
+                            let textureID = findOrDefaultTextureID(params[7]);
+                            regionInfo.ID = textureID.ID;
+                            regionInfo.color = textureID.color;
+                            regionInfo.x = parseFloat(params[1]);
+                            regionInfo.y = parseFloat(params[2]);
+                            regionInfo.w = parseFloat(params[4]) - parseFloat(params[1]);
+                            regionInfo.h = parseFloat(params[5]) - parseFloat(params[2]);
+                            imageInfo.regionsLoaded.push(regionInfo);
+                        }
+                    })
+                });
+                gImageInfoEditor.drawImageInfo();
+            }
+            fileReader.readAsText(file);
+        }
+    }
+    inputLoadTextFiles.click();
+}
+
 // buttonScaleDownOnClick
 function buttonScaleDownOnClick(event: MouseEvent) {
     gImageInfoEditor.setScale(gImageInfoEditor.scale / 2);
@@ -114,10 +155,12 @@ window.onload = event => {
     radioPreview = document.getElementById("radioPreview") as HTMLInputElement;
     radioSelectionModeAdd = document.getElementById("radioSelectionModeAdd") as HTMLInputElement;
     radioSelectionModeRemove = document.getElementById("radioSelectionModeRemove") as HTMLInputElement;
+    divTextureIDListContainer = document.getElementById("divTextureIDListContainer") as HTMLDivElement;
     buttonAddTextureID = document.getElementById("buttonAddTextureID") as HTMLInputElement;
     buttonSubmit = document.getElementById("buttonSubmit") as HTMLButtonElement;
     buttonLoadRegions = document.getElementById("buttonLoadRegions") as HTMLButtonElement;
     buttonLoadCurves = document.getElementById("buttonLoadCurves") as HTMLButtonElement;
+    inputLoadTextFiles = document.getElementById("inputLoadTextFiles") as HTMLInputElement;
     inputSourceIndex = document.getElementById("inputSourceIndex") as HTMLInputElement;
     // get elements - center panel
     labelScaleFactor = document.getElementById("labelScaleFactor") as HTMLLabelElement;
@@ -126,12 +169,39 @@ window.onload = event => {
 
     // create global objects
     gImageInfoList = new Array<ImageInfo>();
-    gTextureIDList = new Array<TextureID>();
+    gTextureIDList = [
+        new TextureID("A", "blue"),
+        new TextureID("B", "red"),
+        new TextureID("C", "green"),
+        new TextureID("D", "orange"),
+        new TextureID("E", "#B0187B"),
+        new TextureID("F", "#8B7DA3"),
+        new TextureID("G", "#A545BB"),
+        new TextureID("H", "#C7A248"),
+        new TextureID("I", "#39F992"),
+        new TextureID("J", "#324CF7"),
+        new TextureID("K", "#D04D5E"),
+        new TextureID("L", "#1E88E6"),
+        new TextureID("M", "#92BFB3"),
+        new TextureID("N", "#858D1A"),
+        new TextureID("O", "#92E877"),
+        new TextureID("P", "#1FDFD9"),
+        new TextureID("Q", "#DD7488"),
+        new TextureID("R", "#9DACBB"),
+        new TextureID("S", "#934591"),
+        new TextureID("T", "#FC9AA4"),
+    ];
     gSessionInfo = new SessionInfo();
     gSessionInfo.sessionID = Math.random().toString(36).slice(2);
 
     // create image info editor
     gImageInfoEditor = new ImageInfoEditor(divImageInfoPanel);
+    gImageInfoEditor.onchangedImageInfo = imageInfo => console.log(imageInfo.fileRef.name);
+    gImageInfoEditor.setTextureID(gTextureIDList[0]);
+    //create texture ID list view
+    gTextureIDListView = new TextureIDListView(divTextureIDListContainer, gTextureIDList);
+    gTextureIDListView.onchangedTextureID = textureID => gImageInfoEditor.setTextureID(textureID);
+    gTextureIDListView.onchangedDescription = textureID => console.log(textureID);
 
     // init elements
     inputSessionID.value = gSessionInfo.sessionID;
@@ -145,6 +215,7 @@ window.onload = event => {
     radioLoaded.onchange = event => gImageInfoEditor.setRegionInfoSource(RegionInfoSource.LOADED);
     radioSelectionModeAdd.onchange = event => gImageInfoEditor.setSelectionMode(SelectionMode.ADD);
     radioSelectionModeRemove.onchange = event => gImageInfoEditor.setSelectionMode(SelectionMode.REMOVE);
+    buttonLoadRegions.onclick = event => buttonLoadRegionsOnClick(event);
     // center panel events
     divImageInfoPanel.onmouseup = event => gImageInfoEditor.onMouseUp(event);
     divImageInfoPanel.onmousemove = event => gImageInfoEditor.onMouseMove(event);
@@ -153,4 +224,12 @@ window.onload = event => {
     inputDescription.oninput = event => gSessionInfo.description = inputDescription.value;
     buttonScaleDown.onclick = event => buttonScaleDownOnClick(event);
     buttonScaleUp.onclick = event => buttonScaleUpOnClick(event);
+}
+
+// findOrDefaultTextureID
+function findOrDefaultTextureID(ID: string) {
+    for (let textureID of gTextureIDList)
+        if (textureID.ID === ID)
+            return textureID;
+    return gTextureIDList[0];
 }
