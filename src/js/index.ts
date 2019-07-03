@@ -197,6 +197,7 @@ function buttonLoadRegionsOnClick(event) {
                         imageInfo.regionsLoaded.push(regionInfo);
                 });
                 gImageInfoEditor.drawImageInfo();
+                gRegionInfosViewer.update();
             }
             fileReader.readAsText(file);
         }
