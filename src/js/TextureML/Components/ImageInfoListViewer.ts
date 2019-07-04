@@ -10,7 +10,8 @@ export class ImageInfoListViewer {
     public scale: number = 1.0;
     // color map type
     private colorMapType: ColorMapType = ColorMapType.GRAY_SCALE;
-
+    // events
+    public onclickImageInfo: (this: ImageInfoListViewer, imageInfo: ImageInfo) => any = null;
     // constructor 
     constructor(parent: HTMLDivElement, imageInfoList: Array<ImageInfo>) {
         // set fields
@@ -81,6 +82,12 @@ export class ImageInfoListViewer {
         var canvas = document.createElement('canvas');
         canvas.width = canvas_width;
         canvas.height = canvas_height;
+        canvas.style.cursor = "pointer";
+        canvas["imageInfo"] = imageInfo;
+        canvas.onclick = (event) => {
+            if (this.onclickImageInfo)
+                this.onclickImageInfo(event.target["imageInfo"]);
+        };
 
         // get context
         var ctx = canvas.getContext('2d');

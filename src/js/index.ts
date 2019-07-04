@@ -53,6 +53,14 @@ let gImageInfoListViewer: ImageInfoListViewer = null;
 let gTextureIDListView: TextureIDListView = null;
 let gRegionInfosViewer: RegionInfosViewer = null;
 
+// setCurrentImageInfo
+function setCurrentImageInfo(imageInfo: ImageInfo) {
+    gImageInfoEditor.setImageInfo(imageInfo);
+    selectImageNumber.selectedIndex = gImageInfoList.findIndex(item => item === imageInfo);
+    radioEdit.checked = true;
+    radioEdit.onchange(null);
+}
+
 // selectImageNumberUpdate
 function selectImageNumberUpdate() {
     // get selected index
@@ -63,7 +71,7 @@ function selectImageNumberUpdate() {
     for (let imageInfo of gImageInfoList) {
         // create new selector
         let optionImageInfo = document.createElement('option') as HTMLOptionElement;
-        optionImageInfo.value = imageInfo as any;
+        optionImageInfo.value = imageInfo.fileRef.name;
         optionImageInfo.innerHTML = imageInfo.fileRef.name;
         selectImageNumber.appendChild(optionImageInfo);
     }
@@ -306,6 +314,7 @@ window.onload = event => {
     gImageInfoEditor.setTextureID(gTextureIDList[0]);
     // create image info list viewer
     gImageInfoListViewer = new ImageInfoListViewer(divImageInfoPreviewPanel, gImageInfoList);
+    gImageInfoListViewer.onclickImageInfo = imageInfo => setCurrentImageInfo(imageInfo);
     divImageInfoPreviewPanel.style.display = "none";
     // create texture ID list viewer
     gTextureIDListView = new TextureIDListView(divTextureIDListContainer, gTextureIDList);
@@ -313,6 +322,7 @@ window.onload = event => {
     gTextureIDListView.onchangedDescription = textureID => selectTextureIDUpdate();
     // create region infos viewer
     gRegionInfosViewer = new RegionInfosViewer(divRegionInfosListViewer, gTextureIDList, gImageInfoList);
+    gRegionInfosViewer.onclickImageInfo = imageInfo => setCurrentImageInfo(imageInfo);
     gRegionInfosViewer.setTextureID(gTextureIDList[0]);
     // update
     selectTextureIDUpdate();

@@ -17,6 +17,8 @@ export class RegionInfosViewer {
     private regionInfoSource: RegionInfoSource = RegionInfoSource.MANUAL;
     // texture id
     private textureID: TextureID = null;
+    // events
+    public onclickImageInfo: (this: RegionInfosViewer, imageInfo: ImageInfo) => any = null;
     // constructor
     constructor(parent: HTMLDivElement, textureIDList: Array<TextureID>, imageInfoList: Array<ImageInfo>) {
         // parent
@@ -106,6 +108,12 @@ export class RegionInfosViewer {
         var canvas = document.createElement('canvas');
         canvas.width = canvas_width;
         canvas.height = canvas_height;
+        canvas.style.cursor = "pointer";
+        canvas["imageInfo"] = imageInfo;
+        canvas.onclick = (event) => {
+            if (this.onclickImageInfo)
+                this.onclickImageInfo(event.target["imageInfo"]);
+        };
 
         // get context and draw original image
         var ctx = canvas.getContext('2d');
