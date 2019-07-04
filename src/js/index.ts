@@ -170,6 +170,26 @@ function buttonAddTextureIDOnClick(event) {
     selectTextureIDUpdate();
 }
 
+// buttonSubmitOnClick
+function buttonSubmitOnClick(event) {
+    let result = "";
+    for (let imageInfo of gImageInfoList) {
+        for (let regionInfo of imageInfo.regionsManual) {
+            result +=
+                imageInfo.fileRef.name + ", " +
+                regionInfo.x + ", " +
+                regionInfo.y + ", " +
+                "1, " +
+                (regionInfo.x + regionInfo.w) + ", " +
+                (regionInfo.y + regionInfo.h) + ", " +
+                "1, " +
+                regionInfo.ID + ", " +
+                gTextureIDList.find(textureID => textureID.ID === regionInfo.ID).name + "\r\n";
+        }
+    }
+    downloadFile(result, 'regions.txt', 'text/plain');
+}
+
 // buttonLoadRegionsOnClick
 function buttonLoadRegionsOnClick(event) {
     inputLoadTextFiles.accept = '.txt';
@@ -312,6 +332,7 @@ window.onload = event => {
     radioSelectionModeAdd.onchange = event => gImageInfoEditor.setSelectionMode(SelectionMode.ADD);
     radioSelectionModeRemove.onchange = event => gImageInfoEditor.setSelectionMode(SelectionMode.REMOVE);
     buttonAddTextureID.onclick = event => buttonAddTextureIDOnClick(event);
+    buttonSubmit.onclick = event => buttonSubmitOnClick(event);
     buttonLoadRegions.onclick = event => buttonLoadRegionsOnClick(event);
     // center panel events
     divImageInfoPanel.onmouseup = event => gImageInfoEditor.onMouseUp(event);
@@ -339,4 +360,13 @@ function generateRandomColor() {
 // next char
 function nextChar(c) {
     return String.fromCharCode(c.charCodeAt(0) + 1);
+}
+
+//  downloadFile
+function downloadFile(text: string, name: string, type: string) {
+    let a = document.createElement("a");
+    let file = new Blob([text], { type: type });
+    a.href = URL.createObjectURL(file);
+    a.download = name;
+    a.click();
 }
