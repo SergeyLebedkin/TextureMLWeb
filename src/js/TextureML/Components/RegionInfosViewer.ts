@@ -64,19 +64,30 @@ export class RegionInfosViewer {
 
         // this is temporary solution. There will be previews
         for (let imageInfo of this.imageInfoList) {
+            let regionInfoCount = 0;
             // add manual regions
             if (this.regionInfoSource === RegionInfoSource.MANUAL) {
                 for (let regionInfo of imageInfo.regionsManual) {
-                    if (regionInfo.ID === this.textureID.ID)
+                    if (regionInfo.ID === this.textureID.ID) {
                         this.appendRegionInfoItem(imageInfo, regionInfo);
+                        regionInfoCount++;
+                    }
                 }
             }
             // add loaded regions
             if (this.regionInfoSource === RegionInfoSource.LOADED) {
                 for (let regionInfo of imageInfo.regionsLoaded) {
-                    if (regionInfo.ID === this.textureID.ID)
+                    if (regionInfo.ID === this.textureID.ID) {
                         this.appendRegionInfoItem(imageInfo, regionInfo);
+                        regionInfoCount++;
+                    }
                 }
+            }
+            // add separation line
+            if (regionInfoCount > 0) {
+                let hr = document.createElement("hr");
+                hr.style.width = "100%";
+                this.parent.appendChild(hr);
             }
         }
     }
@@ -109,6 +120,7 @@ export class RegionInfosViewer {
         canvas.width = canvas_width;
         canvas.height = canvas_height;
         canvas.style.cursor = "pointer";
+        canvas.style.border = "3px solid " + regionInfo.color;
         canvas["imageInfo"] = imageInfo;
         canvas.onclick = (event) => {
             if (this.onclickImageInfo)
