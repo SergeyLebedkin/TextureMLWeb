@@ -86,7 +86,7 @@ export class RegionInfosViewer {
             // add separation line
             if (regionInfoCount > 0) {
                 let hr = document.createElement("hr");
-                hr.style.width = "100%";
+                hr.style.width = "90%";
                 this.parent.appendChild(hr);
             }
         }
