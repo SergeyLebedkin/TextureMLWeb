@@ -180,6 +180,21 @@ function buttonAddTextureIDOnClick(event) {
 
 // buttonSubmitOnClick
 function buttonSubmitOnClick(event) {
+    let xhr = new XMLHttpRequest();
+    let url = "http://localhost:8082/post_session_id";
+    xhr.open("POST", url, true);
+    xhr.setRequestHeader("Content-Type", "application/json");
+    xhr.onreadystatechange = event => {
+        console.log(event.target["status"]);
+        if (xhr.readyState === 4 && xhr.status === 200) {
+            let json = JSON.parse(xhr.responseText);
+            console.log(json);
+        }
+    };
+    //let data = JSON.stringify({"session_id": "1234567"});
+    let data = JSON.stringify({"session_id": "12345678"});
+    xhr.send(data);
+    /*
     let result = "";
     for (let imageInfo of gImageInfoList) {
         for (let regionInfo of imageInfo.regionsManual) {
@@ -196,6 +211,7 @@ function buttonSubmitOnClick(event) {
         }
     }
     downloadFile(result, 'regions.txt', 'text/plain');
+    */
 }
 
 // buttonLoadRegionsOnClick
