@@ -180,38 +180,11 @@ function buttonAddTextureIDOnClick(event) {
 
 // buttonSubmitOnClick
 function buttonSubmitOnClick(event) {
-    let xhr = new XMLHttpRequest();
-    let url = "http://localhost:8082/post_session_id";
-    xhr.open("POST", url, true);
-    xhr.setRequestHeader("Content-Type", "application/json");
-    xhr.onreadystatechange = event => {
-        console.log(event.target["status"]);
-        if (xhr.readyState === 4 && xhr.status === 200) {
-            let json = JSON.parse(xhr.responseText);
-            console.log(json);
-        }
-    };
-    //let data = JSON.stringify({"session_id": "1234567"});
-    let data = JSON.stringify({"session_id": "12345678"});
-    xhr.send(data);
-    /*
-    let result = "";
-    for (let imageInfo of gImageInfoList) {
-        for (let regionInfo of imageInfo.regionsManual) {
-            result +=
-                imageInfo.fileRef.name + ", " +
-                regionInfo.x + ", " +
-                regionInfo.y + ", " +
-                "1, " +
-                (regionInfo.x + regionInfo.w) + ", " +
-                (regionInfo.y + regionInfo.h) + ", " +
-                "1, " +
-                regionInfo.ID + ", " +
-                gTextureIDList.find(textureID => textureID.ID === regionInfo.ID).name + "\r\n";
-        }
+    if (gImageInfoEditor.imageInfo) {
+        //gSessionInfo.postSession();
+        //gSessionInfo.postImages(gImageInfoList);
+        gSessionInfo.postRegions(gImageInfoList);
     }
-    downloadFile(result, 'regions.txt', 'text/plain');
-    */
 }
 
 // buttonLoadRegionsOnClick
@@ -322,7 +295,8 @@ window.onload = event => {
         new TextureID("T", "#FC9AA4"),
     ];
     gSessionInfo = new SessionInfo();
-    gSessionInfo.sessionID = Math.random().toString(36).slice(2);
+    //gSessionInfo.sessionID = Math.random().toString(36).slice(2);
+    gSessionInfo.sessionID = "1234567";
 
     // create image info editor
     gImageInfoEditor = new ImageInfoEditor(divImageInfoPanel);
