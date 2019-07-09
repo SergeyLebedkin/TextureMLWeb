@@ -5,6 +5,7 @@ import { Curve } from "./Curve"
 export class ImageInfo {
     // file reference
     public fileRef: File = null;
+    public baseName: String = null;
     // canvases
     public canvasImage: HTMLCanvasElement = null;
     public canvasImageJet: HTMLCanvasElement = null;
@@ -25,7 +26,7 @@ export class ImageInfo {
         // data
         this.regionsManual = [];
         this.regionsLoaded = [];
-        this.curves = [];
+        this.curves = [new Curve(), new Curve(), new Curve()];
         // events
         this.onloadImageFile = null;
     }
@@ -56,8 +57,10 @@ export class ImageInfo {
     public loadImageFromFile(file: File): void {
         // check for null
         if (file === null) return;
-        // read file
+        // store name
         this.fileRef = file;
+        this.baseName = this.fileRef.name.split('.').slice(0, -1).join('.');
+        // read file
         var fileReader = new FileReader();
         fileReader.onload = event => {
             let image = new Image();

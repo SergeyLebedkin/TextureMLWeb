@@ -9,6 +9,8 @@ import { RegionInfo } from "./TextureML/Types/RegionInfo";
 import { TextureIDListView } from "./TextureML/Components/TextureIDListViewer";
 import { ImageInfoListViewer } from "./TextureML/Components/ImageInfoListViewer";
 import { RegionInfosViewer } from "./TextureML/Components/RegionInfosViewer";
+import { rejects } from "assert";
+import { CurvePoint } from "./TextureML/Types/CurvePoint";
 
 // get elements - left panel
 let divImageInfoPanel: HTMLDivElement = null;
@@ -181,9 +183,18 @@ function buttonAddTextureIDOnClick(event) {
 // buttonSubmitOnClick
 function buttonSubmitOnClick(event) {
     if (gImageInfoEditor.imageInfo) {
-        //gSessionInfo.postSession();
-        //gSessionInfo.postImages(gImageInfoList);
-        gSessionInfo.postRegions(gImageInfoList);
+        gSessionInfo.postSession().then(result => {
+            console.log(result);
+            return gSessionInfo.postImages(gImageInfoList);
+        }).then(result => {
+            console.log(result);
+            return gSessionInfo.postRegions(gImageInfoList)
+        }).then(result => {
+            parceRegionsResponse(result);
+            radioLoaded.checked = true;
+            radioLoaded.onchange(null);
+            gImageInfoEditor.drawImageInfo();
+        });
     }
 }
 
@@ -344,6 +355,45 @@ window.onload = event => {
     buttonScaleUp.onclick = event => buttonScaleUpOnClick(event);
     // right panel events
     selectTextureID.onchange = (event) => gRegionInfosViewer.setTextureID(selectTextureID.options[selectTextureID.selectedIndex]["textureID"]);
+}
+
+// parceRegionsResponse
+function parceRegionsResponse(response: string): void {
+    let data = JSON.parse(response);
+    // check for saccess
+    if (data["success"]) {
+        let eval_results = data["eval_results"];
+        // get main nodes
+        let basenames = eval_results["basename"];
+        let cropnames = eval_results["cropname"];
+        let emb0s = eval_results["emb0"];
+        let emb1s = eval_results["emb1"];
+        let emb2s = eval_results["emb2"];
+        let ids = eval_results["id"];
+        let labels = eval_results["label"];
+        let pixel_starts = eval_results["pixel_start"];
+        let pixel_ends = eval_results["pixel_end"];
+        for (let basename in basenames) {
+            let imageInfo = gImageInfoList.find(imageInfo => imageInfo.baseName == basenames[basename]);
+            let textureID = gTextureIDList[labels[basename]];
+            if (imageInfo) {
+                let emb0: number = emb0s[basename];
+                let emb1: number = emb1s[basename];
+                let emb2: number = emb2s[basename];
+                let pixel_start: number = pixel_starts[basename];
+                let pixel_end: number = pixel_ends[basename];
+                console.log(pixel_start);
+                console.log(pixel_end);
+                imageInfo.curves[0].color = gTextureIDList[0].color;
+                imageInfo.curves[1].color = gTextureIDList[1].color;
+                imageInfo.curves[2].color = gTextureIDList[2].color;
+                imageInfo.curves[0].points.push(new CurvePoint(emb0, (pixel_end + pixel_start) / 2));
+                imageInfo.curves[1].points.push(new CurvePoint(emb1, (pixel_end + pixel_start) / 2));
+                imageInfo.curves[2].points.push(new CurvePoint(emb2, (pixel_end + pixel_start) / 2));
+                imageInfo.regionsLoaded.push(new RegionInfo(0, pixel_start, imageInfo.canvasImage.width, pixel_end - pixel_start, textureID.ID, textureID.color));
+            }
+        }
+    }
 }
 
 // generate random color

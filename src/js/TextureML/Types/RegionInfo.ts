@@ -9,13 +9,13 @@ export class RegionInfo {
     public color: string = "red";
 
     // constructor
-    constructor() {
-        this.x = 0;
-        this.y = 0;
-        this.w = 0;
-        this.h = 0;
-        this.ID = "";
-        this.color = "red";
+    constructor(x: number = 0, y: number = 0, w: number = 0, h: number = 0, ID: string = "", color: string = "red") {
+        this.x = x;
+        this.y = y;
+        this.w = w;
+        this.h = h;
+        this.ID = ID;
+        this.color = color;
     }
 
     // normalize region

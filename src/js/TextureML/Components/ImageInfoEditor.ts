@@ -12,6 +12,9 @@ export class ImageInfoEditor {
     // main canvas
     private imageCanvas: HTMLCanvasElement = null;
     private imageCanvasCtx: CanvasRenderingContext2D = null;
+    // curves canvas
+    private curvesCanvas: HTMLCanvasElement = null;
+    private curvesCanvasCtx: CanvasRenderingContext2D = null;
     // image info
     public imageInfo: ImageInfo = null;
     public textureID: TextureID = null;
@@ -37,6 +40,12 @@ export class ImageInfoEditor {
         this.imageCanvas.style.border = "1px solid orange";
         this.imageCanvasCtx = this.imageCanvas.getContext('2d');
         this.parent.appendChild(this.imageCanvas);
+        // create curves canvas
+        this.curvesCanvas = document.createElement("canvas");
+        this.curvesCanvas.style.display = "none"
+        this.curvesCanvas.style.border = "1px solid gray";
+        this.curvesCanvasCtx = this.curvesCanvas.getContext('2d');
+        this.parent.appendChild(this.curvesCanvas);
         // image info
         this.imageInfo = null;
         this.textureID = null;
@@ -178,6 +187,10 @@ export class ImageInfoEditor {
     // setRegionInfoSource
     public setRegionInfoSource(regionInfoSource: RegionInfoSource): void {
         this.regionInfoSource = regionInfoSource;
+        if (this.regionInfoSource === RegionInfoSource.MANUAL)
+            this.curvesCanvas.style.display = "none";
+        if (this.regionInfoSource === RegionInfoSource.LOADED)
+            this.curvesCanvas.style.display = "inline";
         this.drawImageInfo();
     }
 
@@ -264,7 +277,40 @@ export class ImageInfoEditor {
             this.imageCanvasCtx.drawImage(this.imageInfo.canvasImageJet, 0, 0, this.imageCanvas.width, this.imageCanvas.height);
         // draw image info regions
         this.drawImageInfoRegions();
+        // draw curves
+        this.drawCurves();
     }
+
+    // drawCurves
+    drawCurves() {
+        if (this.imageInfo !== null) {
+            // set curves parameters
+            this.curvesCanvas.width = this.imageInfo.canvasImage.width * this.scale;
+            this.curvesCanvas.height = this.imageInfo.canvasImage.height * this.scale;
+            this.curvesCanvasCtx.clearRect(0, 0, this.curvesCanvas.width, this.curvesCanvas.height);
+
+            // draw curves
+            //for (var i = 0; i < this.imageInfo.curves.length; i++) {
+            for (let curve of this.imageInfo.curves) {
+                if (curve.points.length > 1) {
+                    this.curvesCanvasCtx.beginPath();
+                    let x = curve.points[0].x * this.curvesCanvas.width;
+                    let y = curve.points[0].y * this.scale;
+                    this.curvesCanvasCtx.moveTo(x, y);
+                    // move by points
+                    for (var j = 1; j < curve.points.length; j++) {
+                        let x = curve.points[j].x * this.curvesCanvas.width;
+                        let y = curve.points[j].y * this.scale;
+                        this.curvesCanvasCtx.lineTo(x, y);
+                    }
+                    this.curvesCanvasCtx.lineWidth = 3;
+                    this.curvesCanvasCtx.strokeStyle = curve.color;
+                    this.curvesCanvasCtx.stroke();
+                }
+            }
+        }
+    }
+
 }
 
 // get mause position for element
