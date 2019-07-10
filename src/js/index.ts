@@ -32,6 +32,7 @@ let radioSelectionModeRemove: HTMLInputElement = null;
 let divTextureIDListContainer: HTMLDivElement = null;
 let buttonAddTextureID: HTMLInputElement = null;
 let buttonSubmit: HTMLButtonElement = null;
+let buttonSave: HTMLButtonElement = null;
 let buttonLoadRegions: HTMLButtonElement = null;
 let buttonLoadCurves: HTMLButtonElement = null;
 let inputLoadTextFiles: HTMLInputElement = null;
@@ -190,47 +191,36 @@ function buttonSubmitOnClick(event) {
             console.log(result);
             return gSessionInfo.postRegions(gImageInfoList)
         }).then(result => {
+            console.log(result);
             parceRegionsResponse(result);
             radioLoaded.checked = true;
             radioLoaded.onchange(null);
-            gImageInfoEditor.drawImageInfo();
+            //gImageInfoEditor.drawImageInfo();
         });
     }
 }
 
-// buttonLoadRegionsOnClick
-function buttonLoadRegionsOnClick(event) {
-    inputLoadTextFiles.accept = '.txt';
-    inputLoadTextFiles.onchange = event => {
-        let files: Array<File> = event.currentTarget["files"];
-        for (let file of files) {
-            var fileReader = new FileReader();
-            fileReader.onload = event => {
-                event.target["result"].split('\n').forEach((str: string) => {
-                    if (str.length === 0) return;
-                    let params: string[] = str.split(',');
-                    params = params.map(param => param.trim());
-                    // gey image info and texture id
-                    let imageInfo = gImageInfoList.find(imageInfo => imageInfo.fileRef.name === params[0]);
-                    let textureID = gTextureIDList.find(textureID => textureID.ID === params[7]);
-                    // add new region info 
-                    let regionInfo = new RegionInfo();
-                    regionInfo.ID = textureID ? textureID.ID : gTextureIDList[0].ID;
-                    regionInfo.color = textureID ? textureID.color : gTextureIDList[0].color;
-                    regionInfo.x = parseFloat(params[1]);
-                    regionInfo.y = parseFloat(params[2]);
-                    regionInfo.w = parseFloat(params[4]) - parseFloat(params[1]);
-                    regionInfo.h = parseFloat(params[5]) - parseFloat(params[2]);
-                    if (imageInfo)
-                        imageInfo.regionsLoaded.push(regionInfo);
-                });
-                gImageInfoEditor.drawImageInfo();
-                gRegionInfosViewer.update();
-            }
-            fileReader.readAsText(file);
+// buttonSaveOnClick
+function buttonSaveOnClick(event: MouseEvent) {
+    var regionsString = '';
+    for (let imageInfo of gImageInfoList) {
+        for (let regionInfo of imageInfo.regionsLoaded) {
+            regionsString +=
+                imageInfo.fileRef.name + ", " +
+                regionInfo.x + ", " +
+                regionInfo.y + ", " +
+                "1, " +
+                (regionInfo.x + regionInfo.w) + ", " +
+                (regionInfo.y + regionInfo.h) + ", " +
+                "1, " +
+                regionInfo.ID + ", " +
+                gTextureIDList.find(textureID => textureID.ID === regionInfo.ID).name + "\r\n";
+            ;
         }
     }
-    inputLoadTextFiles.click();
+
+    downloadFile(regionsString, 'regions.txt', 'text/plain');
+
 }
 
 // buttonScaleDownOnClick
@@ -269,6 +259,7 @@ window.onload = event => {
     divTextureIDListContainer = document.getElementById("divTextureIDListContainer") as HTMLDivElement;
     buttonAddTextureID = document.getElementById("buttonAddTextureID") as HTMLInputElement;
     buttonSubmit = document.getElementById("buttonSubmit") as HTMLButtonElement;
+    buttonSave = document.getElementById("buttonSave") as HTMLButtonElement;
     buttonLoadRegions = document.getElementById("buttonLoadRegions") as HTMLButtonElement;
     buttonLoadCurves = document.getElementById("buttonLoadCurves") as HTMLButtonElement;
     inputLoadTextFiles = document.getElementById("inputLoadTextFiles") as HTMLInputElement;
@@ -344,7 +335,7 @@ window.onload = event => {
     radioSelectionModeRemove.onchange = event => gImageInfoEditor.setSelectionMode(SelectionMode.REMOVE);
     buttonAddTextureID.onclick = event => buttonAddTextureIDOnClick(event);
     buttonSubmit.onclick = event => buttonSubmitOnClick(event);
-    buttonLoadRegions.onclick = event => buttonLoadRegionsOnClick(event);
+    buttonSave.onclick = event => buttonSaveOnClick(event);
     // center panel events
     divImageInfoPanel.onmouseup = event => gImageInfoEditor.onMouseUp(event);
     divImageInfoPanel.onmousemove = event => gImageInfoEditor.onMouseMove(event);
@@ -362,6 +353,10 @@ function parceRegionsResponse(response: string): void {
     let data = JSON.parse(response);
     // check for saccess
     if (data["success"]) {
+        // cleare all curves
+        gImageInfoList.forEach(ImageInfo => ImageInfo.curves.forEach(curve => curve.points = []));
+        gImageInfoList.forEach(ImageInfo => ImageInfo.regionsLoaded = []);
+        // get results
         let eval_results = data["eval_results"];
         // get main nodes
         let basenames = eval_results["basename"];
@@ -382,8 +377,6 @@ function parceRegionsResponse(response: string): void {
                 let emb2: number = emb2s[basename];
                 let pixel_start: number = pixel_starts[basename];
                 let pixel_end: number = pixel_ends[basename];
-                console.log(pixel_start);
-                console.log(pixel_end);
                 imageInfo.curves[0].color = gTextureIDList[0].color;
                 imageInfo.curves[1].color = gTextureIDList[1].color;
                 imageInfo.curves[2].color = gTextureIDList[2].color;

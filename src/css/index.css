@@ -64,7 +64,8 @@ html, body {
 }
 
 #image_canvas_panel {
-    flex-direction: row;
+    display: block;
+    white-space: nowrap;
     overflow: auto;
     text-align: center;
 }

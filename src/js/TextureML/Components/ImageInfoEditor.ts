@@ -12,6 +12,8 @@ export class ImageInfoEditor {
     // main canvas
     private imageCanvas: HTMLCanvasElement = null;
     private imageCanvasCtx: CanvasRenderingContext2D = null;
+    // div gap
+    private gapElement: HTMLElement = null;
     // curves canvas
     private curvesCanvas: HTMLCanvasElement = null;
     private curvesCanvasCtx: CanvasRenderingContext2D = null;
@@ -40,9 +42,13 @@ export class ImageInfoEditor {
         this.imageCanvas.style.border = "1px solid orange";
         this.imageCanvasCtx = this.imageCanvas.getContext('2d');
         this.parent.appendChild(this.imageCanvas);
+        // create gap
+        this.gapElement = document.createElement("canvas");
+        this.gapElement.style.width = "15px";
+        this.gapElement.style.height = "15px";
+        this.parent.appendChild(this.gapElement);
         // create curves canvas
         this.curvesCanvas = document.createElement("canvas");
-        this.curvesCanvas.style.display = "none"
         this.curvesCanvas.style.border = "1px solid gray";
         this.curvesCanvasCtx = this.curvesCanvas.getContext('2d');
         this.parent.appendChild(this.curvesCanvas);
@@ -187,10 +193,6 @@ export class ImageInfoEditor {
     // setRegionInfoSource
     public setRegionInfoSource(regionInfoSource: RegionInfoSource): void {
         this.regionInfoSource = regionInfoSource;
-        if (this.regionInfoSource === RegionInfoSource.MANUAL)
-            this.curvesCanvas.style.display = "none";
-        if (this.regionInfoSource === RegionInfoSource.LOADED)
-            this.curvesCanvas.style.display = "inline";
         this.drawImageInfo();
     }
 
@@ -287,12 +289,16 @@ export class ImageInfoEditor {
             // set curves parameters
             this.curvesCanvas.width = this.imageInfo.canvasImage.width * this.scale;
             this.curvesCanvas.height = this.imageInfo.canvasImage.height * this.scale;
-            this.curvesCanvasCtx.clearRect(0, 0, this.curvesCanvas.width, this.curvesCanvas.height);
-
+            this.curvesCanvasCtx.fillStyle = "black";
+            this.curvesCanvasCtx.fillRect(0, 0, this.curvesCanvas.width, this.curvesCanvas.height);
+            
             // draw curves
             //for (var i = 0; i < this.imageInfo.curves.length; i++) {
             for (let curve of this.imageInfo.curves) {
                 if (curve.points.length > 1) {
+                    console.log("x = ", curve.points.map(point => point.x));
+                    this.curvesCanvasCtx.lineWidth = 3;
+                    this.curvesCanvasCtx.strokeStyle = curve.color;
                     this.curvesCanvasCtx.beginPath();
                     let x = curve.points[0].x * this.curvesCanvas.width;
                     let y = curve.points[0].y * this.scale;
@@ -303,8 +309,6 @@ export class ImageInfoEditor {
                         let y = curve.points[j].y * this.scale;
                         this.curvesCanvasCtx.lineTo(x, y);
                     }
-                    this.curvesCanvasCtx.lineWidth = 3;
-                    this.curvesCanvasCtx.strokeStyle = curve.color;
                     this.curvesCanvasCtx.stroke();
                 }
             }
