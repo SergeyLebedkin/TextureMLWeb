@@ -218,9 +218,8 @@ function buttonSaveOnClick(event: MouseEvent) {
             ;
         }
     }
-
+    // download file
     downloadFile(regionsString, 'regions.txt', 'text/plain');
-
 }
 
 // buttonScaleDownOnClick
