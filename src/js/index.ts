@@ -33,10 +33,6 @@ let divTextureIDListContainer: HTMLDivElement = null;
 let buttonAddTextureID: HTMLInputElement = null;
 let buttonSubmit: HTMLButtonElement = null;
 let buttonSave: HTMLButtonElement = null;
-let buttonLoadRegions: HTMLButtonElement = null;
-let buttonLoadCurves: HTMLButtonElement = null;
-let inputLoadTextFiles: HTMLInputElement = null;
-let inputSourceIndex: HTMLInputElement = null;
 // get elements - center panel
 let labelScaleFactor: HTMLLabelElement = null;
 let buttonScaleDown: HTMLButtonElement = null;
@@ -184,19 +180,15 @@ function buttonAddTextureIDOnClick(event) {
 // buttonSubmitOnClick
 function buttonSubmitOnClick(event) {
     if (gImageInfoEditor.imageInfo) {
-        gSessionInfo.postSession().then(result => {
-            console.log(result);
-            return gSessionInfo.postImages(gImageInfoList);
-        }).then(result => {
-            console.log(result);
-            return gSessionInfo.postRegions(gImageInfoList)
-        }).then(result => {
-            console.log(result);
-            parceRegionsResponse(result);
-            radioLoaded.checked = true;
-            radioLoaded.onchange(null);
-            //gImageInfoEditor.drawImageInfo();
-        });
+        gSessionInfo.postSession()
+            .then(result => gSessionInfo.postImages(gImageInfoList))
+            .then(result => gSessionInfo.postRegions(gImageInfoList))
+            .then(result => {
+                parceRegionsResponse(result);
+                radioLoaded.checked = true;
+                radioLoaded.onchange(null);
+                //gImageInfoEditor.drawImageInfo();
+            });
     }
 }
 
@@ -259,10 +251,6 @@ window.onload = event => {
     buttonAddTextureID = document.getElementById("buttonAddTextureID") as HTMLInputElement;
     buttonSubmit = document.getElementById("buttonSubmit") as HTMLButtonElement;
     buttonSave = document.getElementById("buttonSave") as HTMLButtonElement;
-    buttonLoadRegions = document.getElementById("buttonLoadRegions") as HTMLButtonElement;
-    buttonLoadCurves = document.getElementById("buttonLoadCurves") as HTMLButtonElement;
-    inputLoadTextFiles = document.getElementById("inputLoadTextFiles") as HTMLInputElement;
-    inputSourceIndex = document.getElementById("inputSourceIndex") as HTMLInputElement;
     // get elements - center panel
     labelScaleFactor = document.getElementById("labelScaleFactor") as HTMLLabelElement;
     buttonScaleDown = document.getElementById("buttonScaleDown") as HTMLButtonElement;

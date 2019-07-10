@@ -296,7 +296,6 @@ export class ImageInfoEditor {
             //for (var i = 0; i < this.imageInfo.curves.length; i++) {
             for (let curve of this.imageInfo.curves) {
                 if (curve.points.length > 1) {
-                    console.log("x = ", curve.points.map(point => point.x));
                     this.curvesCanvasCtx.lineWidth = 3;
                     this.curvesCanvasCtx.strokeStyle = curve.color;
                     this.curvesCanvasCtx.beginPath();

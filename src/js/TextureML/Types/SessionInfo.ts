@@ -79,7 +79,6 @@ export class SessionInfo {
             imageInfos.forEach(imageInfo => dataJSON.regions[imageInfo.fileRef.name] = imageInfo.regionsManual.map(region => region.asJSON()))
             let data = JSON.stringify(dataJSON);
             xhr.send(data);
-            console.log("postRegions: " + data);
         });
     }
 }
