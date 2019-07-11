@@ -272,7 +272,6 @@ window.onload = event => {
     ];
     gSessionInfo = new SessionInfo();
     gSessionInfo.sessionID = Math.random().toString(36).slice(2);
-    //gSessionInfo.sessionID = "1234567";
 
     // create image info editor
     gImageInfoEditor = new ImageInfoEditor(divImageInfoPanel);
