@@ -271,12 +271,12 @@ window.onload = event => {
         new TextureID("T", "#FC9AA4"),
     ];
     gSessionInfo = new SessionInfo();
-    //gSessionInfo.sessionID = Math.random().toString(36).slice(2);
-    gSessionInfo.sessionID = "1234567";
+    gSessionInfo.sessionID = Math.random().toString(36).slice(2);
+    //gSessionInfo.sessionID = "1234567";
 
     // create image info editor
     gImageInfoEditor = new ImageInfoEditor(divImageInfoPanel);
-    gImageInfoEditor.onchangedImageInfo = imageInfo => gRegionInfosViewer.update();
+    gImageInfoEditor.onchangedImageInfo = imageInfo => {gRegionInfosViewer.update(); buttonSave.disabled = true;}
     gImageInfoEditor.setTextureID(gTextureIDList[0]);
     // create image info list viewer
     gImageInfoListViewer = new ImageInfoListViewer(divImageInfoPreviewPanel, gImageInfoList);
@@ -342,7 +342,7 @@ function parceRegionsResponse(response: string): void {
         let pixel_ends = eval_results["pixel_end"];
         for (let basename in basenames) {
             let imageInfo: ImageInfo = gImageInfoList.find(imageInfo => imageInfo.baseName == basenames[basename]);
-            //let textureID: = gTextureIDList.find(textureID => textureID.ID == labels[basename]);
+            //let textureID: TextureID = gTextureIDList.find(textureID => textureID.ID == labels[basename]);
             let textureID: TextureID = gTextureIDList[labels[basename]];
             if (imageInfo) {
                 let emb0: number = emb0s[basename];
