@@ -8,7 +8,6 @@ import { RegionInfo } from "./TextureML/Types/RegionInfo";
 import { TextureIDListView } from "./TextureML/Components/TextureIDListViewer";
 import { ImageInfoListViewer } from "./TextureML/Components/ImageInfoListViewer";
 import { RegionInfosViewer } from "./TextureML/Components/RegionInfosViewer";
-import { rejects } from "assert";
 import { CurvePoint } from "./TextureML/Types/CurvePoint";
 
 // get elements - left panel

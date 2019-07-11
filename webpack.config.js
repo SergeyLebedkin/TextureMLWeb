@@ -9,7 +9,7 @@ module.exports = {
     },
     output: {
         path: path.resolve(__dirname, 'dist'),
-        filename: 'js/[name].js'
+        filename: 'static/js/[name].js'
     },
     node: {
         fs: 'empty' // need for tiff.js
@@ -31,7 +31,7 @@ module.exports = {
     plugins: [
         new CleanWebpackPlugin(),
         new CopyWebpackPlugin([
-            { from: "src/css", to: "css" },
+            { from: "src/css", to: "static/css" },
             //{ from: "src/js/deps", to: "js/deps" }
         ]),
         new HtmlWebpackPlugin({
