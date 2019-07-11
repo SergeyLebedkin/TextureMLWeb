@@ -248,33 +248,18 @@ window.onload = event => {
     // create global objects
     gImageInfoList = new Array<ImageInfo>();
     gTextureIDList = [
-        new TextureID("A", "blue"),
-        new TextureID("B", "red"),
-        new TextureID("C", "green"),
-        new TextureID("D", "orange"),
-        new TextureID("E", "#B0187B"),
-        new TextureID("F", "#8B7DA3"),
-        new TextureID("G", "#A545BB"),
-        new TextureID("H", "#C7A248"),
-        new TextureID("I", "#39F992"),
-        new TextureID("J", "#324CF7"),
-        new TextureID("K", "#D04D5E"),
-        new TextureID("L", "#1E88E6"),
-        new TextureID("M", "#92BFB3"),
-        new TextureID("N", "#858D1A"),
-        new TextureID("O", "#92E877"),
-        new TextureID("P", "#1FDFD9"),
-        new TextureID("Q", "#DD7488"),
-        new TextureID("R", "#9DACBB"),
-        new TextureID("S", "#934591"),
-        new TextureID("T", "#FC9AA4"),
+        new TextureID("A", "blue"), new TextureID("B", "red"), new TextureID("C", "green"), new TextureID("D", "orange"),
+        new TextureID("E", "#B0187B"), new TextureID("F", "#8B7DA3"), new TextureID("G", "#A545BB"), new TextureID("H", "#C7A248"),
+        new TextureID("I", "#39F992"), new TextureID("J", "#324CF7"), new TextureID("K", "#D04D5E"), new TextureID("L", "#1E88E6"),
+        new TextureID("M", "#92BFB3"), new TextureID("N", "#858D1A"), new TextureID("O", "#92E877"), new TextureID("P", "#1FDFD9"),
+        new TextureID("Q", "#DD7488"), new TextureID("R", "#9DACBB"), new TextureID("S", "#934591"), new TextureID("T", "#FC9AA4"),
     ];
     gSessionInfo = new SessionInfo();
     gSessionInfo.sessionID = Math.random().toString(36).slice(2);
 
     // create image info editor
     gImageInfoEditor = new ImageInfoEditor(divImageInfoPanel);
-    gImageInfoEditor.onchangedImageInfo = imageInfo => {gRegionInfosViewer.update(); buttonSave.disabled = true;}
+    gImageInfoEditor.onchangedImageInfo = imageInfo => { gRegionInfosViewer.update(); buttonSave.disabled = true; }
     gImageInfoEditor.setTextureID(gTextureIDList[0]);
     // create image info list viewer
     gImageInfoListViewer = new ImageInfoListViewer(divImageInfoPreviewPanel, gImageInfoList);
