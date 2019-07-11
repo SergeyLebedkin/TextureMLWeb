@@ -3,7 +3,6 @@ import { TextureID } from "./TextureML/Types/TextureID";
 import { SessionInfo } from "./TextureML/Types/SessionInfo";
 import { ImageInfoEditor } from "./TextureML/Components/ImageInfoEditor";
 import { ColorMapType } from "./TextureML/Types/ColorMapType";
-import { RegionInfoSource } from "./TextureML/Types/RegionInfoSource";
 import { SelectionMode } from "./TextureML/Types/SelectionMode";
 import { RegionInfo } from "./TextureML/Types/RegionInfo";
 import { TextureIDListView } from "./TextureML/Components/TextureIDListViewer";
@@ -23,8 +22,6 @@ let inputLoadImages: HTMLInputElement = null;
 let selectImageNumber: HTMLSelectElement = null;
 let radioGrayScale: HTMLInputElement = null;
 let radioColorMapJet: HTMLInputElement = null;
-let radioManual: HTMLInputElement = null;
-let radioLoaded: HTMLInputElement = null;
 let radioEdit: HTMLInputElement = null;
 let radioPreview: HTMLInputElement = null;
 let radioSelectionModeAdd: HTMLInputElement = null;
@@ -45,6 +42,7 @@ let divRegionInfosListViewer: HTMLDivElement = null;
 let gImageInfoList: Array<ImageInfo> = null;
 let gTextureIDList: Array<TextureID> = null;
 let gSessionInfo: SessionInfo = null;
+let gCurrentGeneration: number = 0;
 
 // components
 let gImageInfoEditor: ImageInfoEditor = null;
@@ -142,18 +140,6 @@ function radioColorMapJetOnChange(event) {
     gRegionInfosViewer.setColorMapType(ColorMapType.JET);
 };
 
-// radioManualOnChange
-function radioManualOnChange(event) {
-    gImageInfoEditor.setRegionInfoSource(RegionInfoSource.MANUAL);
-    gRegionInfosViewer.setRegionInfoSource(RegionInfoSource.MANUAL);
-}
-
-// radioLoadedOnChange
-function radioLoadedOnChange(event) {
-    gImageInfoEditor.setRegionInfoSource(RegionInfoSource.LOADED);
-    gRegionInfosViewer.setRegionInfoSource(RegionInfoSource.LOADED);
-}
-
 // radioEditOnChange
 function radioEditOnChange(event) {
     divImageInfoPanel.style.display = "block";
@@ -185,9 +171,12 @@ function buttonSubmitOnClick(event) {
             .then(result => gSessionInfo.postRegions(gImageInfoList))
             .then(result => {
                 parceRegionsResponse(result);
-                radioLoaded.checked = true;
-                radioLoaded.onchange(null);
-                //gImageInfoEditor.drawImageInfo();
+                buttonSave.disabled = false;
+                gCurrentGeneration++;
+                gImageInfoEditor.setPermitOverlapping(true);
+                gImageInfoEditor.setGeneration(gCurrentGeneration);
+                gImageInfoEditor.drawImageInfo();
+                gRegionInfosViewer.update()
             });
     }
 }
@@ -241,8 +230,6 @@ window.onload = event => {
     selectImageNumber = document.getElementById("selectImageNumber") as HTMLSelectElement;
     radioGrayScale = document.getElementById("radioGrayScale") as HTMLInputElement;
     radioColorMapJet = document.getElementById("radioColorMapJet") as HTMLInputElement;
-    radioManual = document.getElementById("radioManual") as HTMLInputElement;
-    radioLoaded = document.getElementById("radioLoaded") as HTMLInputElement;
     radioEdit = document.getElementById("radioEdit") as HTMLInputElement;
     radioPreview = document.getElementById("radioPreview") as HTMLInputElement;
     radioSelectionModeAdd = document.getElementById("radioSelectionModeAdd") as HTMLInputElement;
@@ -314,8 +301,6 @@ window.onload = event => {
     selectImageNumber.onchange = event => selectImageNumberOnChange(event);
     radioGrayScale.onchange = event => radioGrayScaleOnChange(event);
     radioColorMapJet.onchange = event => radioColorMapJetOnChange(event);
-    radioManual.onchange = event => radioManualOnChange(event);
-    radioLoaded.onchange = event => radioLoadedOnChange(event);
     radioEdit.onchange = event => radioEditOnChange(event);
     radioPreview.onchange = event => radioPreviewOnChange(event);
     radioSelectionModeAdd.onchange = event => gImageInfoEditor.setSelectionMode(SelectionMode.ADD);
@@ -356,17 +341,18 @@ function parceRegionsResponse(response: string): void {
         let pixel_starts = eval_results["pixel_start"];
         let pixel_ends = eval_results["pixel_end"];
         for (let basename in basenames) {
-            let imageInfo = gImageInfoList.find(imageInfo => imageInfo.baseName == basenames[basename]);
-            let textureID = gTextureIDList[labels[basename]];
+            let imageInfo: ImageInfo = gImageInfoList.find(imageInfo => imageInfo.baseName == basenames[basename]);
+            //let textureID: = gTextureIDList.find(textureID => textureID.ID == labels[basename]);
+            let textureID: TextureID = gTextureIDList[labels[basename]];
             if (imageInfo) {
                 let emb0: number = emb0s[basename];
                 let emb1: number = emb1s[basename];
                 let emb2: number = emb2s[basename];
                 let pixel_start: number = pixel_starts[basename];
                 let pixel_end: number = pixel_ends[basename];
-                imageInfo.curves[0].color = gTextureIDList[0].color;
-                imageInfo.curves[1].color = gTextureIDList[1].color;
-                imageInfo.curves[2].color = gTextureIDList[2].color;
+                imageInfo.curves[0].color = "blue";
+                imageInfo.curves[1].color = "red";
+                imageInfo.curves[2].color = "green";
                 imageInfo.curves[0].points.push(new CurvePoint(emb0, (pixel_end + pixel_start) / 2));
                 imageInfo.curves[1].points.push(new CurvePoint(emb1, (pixel_end + pixel_start) / 2));
                 imageInfo.curves[2].points.push(new CurvePoint(emb2, (pixel_end + pixel_start) / 2));

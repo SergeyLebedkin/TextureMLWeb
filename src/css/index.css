@@ -114,3 +114,7 @@ html, body {
 .left-panel-button:active {
     background-color: #ff2222;
 }
+
+.left-panel-button:disabled {
+    background-color: #aaaaaa;
+}

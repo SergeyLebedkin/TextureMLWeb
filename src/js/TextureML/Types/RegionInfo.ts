@@ -7,15 +7,17 @@ export class RegionInfo {
     public h: number = 0.0;
     public ID: string = "";
     public color: string = "red";
+    public generation: number = 0;
 
     // constructor
-    constructor(x: number = 0, y: number = 0, w: number = 0, h: number = 0, ID: string = "", color: string = "red") {
+    constructor(x: number = 0, y: number = 0, w: number = 0, h: number = 0, ID: string = "", color: string = "red", generation = 0) {
         this.x = x;
         this.y = y;
         this.w = w;
         this.h = h;
         this.ID = ID;
         this.color = color;
+        this.generation = generation;
     }
 
     // normalize region

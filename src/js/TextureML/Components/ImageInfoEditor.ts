@@ -1,7 +1,6 @@
 import { ImageInfo } from "../Types/ImageInfo"
 import { RegionInfo } from "../Types/RegionInfo"
 import { TextureID } from "../Types/TextureID"
-import { RegionInfoSource } from "../Types/RegionInfoSource"
 import { SelectionMode } from "../Types/SelectionMode"
 import { ColorMapType } from "../Types/ColorMapType"
 
@@ -20,8 +19,6 @@ export class ImageInfoEditor {
     // image info
     public imageInfo: ImageInfo = null;
     public textureID: TextureID = null;
-    // region info source
-    public regionInfoSource: RegionInfoSource = RegionInfoSource.MANUAL;
     // scale
     public scale: number = 1.0;
     // selection
@@ -30,6 +27,10 @@ export class ImageInfoEditor {
     private selectionRegionInfo: RegionInfo = null;
     // color map type
     private colorMapType: ColorMapType = ColorMapType.GRAY_SCALE;
+    // current generation
+    private generation: number = 0;
+    // permit overlapping
+    private permitOverlapping: boolean = false;
     // events
     public onchangedImageInfo: (this: ImageInfoEditor, imageInfo: ImageInfo) => any = null;
 
@@ -55,8 +56,6 @@ export class ImageInfoEditor {
         // image info
         this.imageInfo = null;
         this.textureID = null;
-        // region info source
-        this.regionInfoSource = RegionInfoSource.MANUAL;
         // scale
         this.scale = 1.0;
         // selection
@@ -65,6 +64,10 @@ export class ImageInfoEditor {
         this.selectionRegionInfo = new RegionInfo();
         // color map type
         this.colorMapType = ColorMapType.GRAY_SCALE;
+        // current generation
+        this.generation = 0;
+        // permit overlapping
+        this.permitOverlapping = false;
     }
 
     // onMouseUp
@@ -86,19 +89,22 @@ export class ImageInfoEditor {
                     regionInfo.h = this.selectionRegionInfo.h;
                     regionInfo.ID = this.selectionRegionInfo.ID;
                     regionInfo.color = this.selectionRegionInfo.color;
+                    regionInfo.generation = this.generation;
                     regionInfo.trim(0, 0, this.imageInfo.canvasImage.width, this.imageInfo.canvasImage.height);
 
                     // check size restrictions for small images
                     if ((this.imageInfo.canvasImage.width < 200) &&
                         (this.imageInfo.canvasImage.height < 200)) {
-                        this.removeRegionsInArea(this.selectionRegionInfo);
+                        if (!this.permitOverlapping)
+                            this.removeRegionsInArea(this.selectionRegionInfo);
                         this.imageInfo.regionsManual.push(regionInfo);
                         if (this.onchangedImageInfo)
                             this.onchangedImageInfo(this.imageInfo);
                     }
                     else // check size restrictions for regular images
                         if ((regionInfo.w > 100) && (regionInfo.h > 200)) {
-                            this.removeRegionsInArea(this.selectionRegionInfo);
+                            if (!this.permitOverlapping)
+                                this.removeRegionsInArea(this.selectionRegionInfo);
                             this.imageInfo.regionsManual.push(regionInfo);
                             if (this.onchangedImageInfo)
                                 this.onchangedImageInfo(this.imageInfo);
@@ -144,7 +150,7 @@ export class ImageInfoEditor {
     // onMouseDown
     public onMouseDown(event: MouseEvent): void {
         // set selection state and setup selection region if preview mod is MANUAL
-        if ((this.regionInfoSource === RegionInfoSource.MANUAL) && (this.imageInfo !== null)) {
+        if (this.imageInfo !== null) {
             // get mouse coords
             let mouseCoords = getMousePosByElement(this.imageCanvas, event);
             // start selection
@@ -190,12 +196,6 @@ export class ImageInfoEditor {
         this.drawImageInfo();
     }
 
-    // setRegionInfoSource
-    public setRegionInfoSource(regionInfoSource: RegionInfoSource): void {
-        this.regionInfoSource = regionInfoSource;
-        this.drawImageInfo();
-    }
-
     // setSelectionMode
     public setSelectionMode(selectionMode: SelectionMode): void {
         this.selectionMode = selectionMode;
@@ -224,6 +224,22 @@ export class ImageInfoEditor {
         }
     }
 
+    // setGeneration
+    public setGeneration(generation: number): void {
+        if (this.generation !== generation) {
+            this.generation = generation;
+            this.drawImageInfo();
+        }
+    }
+
+    // setGeneration
+    public setPermitOverlapping(permitOverlapping: boolean): void {
+        if (this.permitOverlapping !== permitOverlapping) {
+            this.permitOverlapping = permitOverlapping;
+            this.drawImageInfo();
+        }
+    }
+
     // drawSelectionRegion
     public drawSelectionRegion(): void {
         if (this.selectionStarted) {
@@ -244,23 +260,21 @@ export class ImageInfoEditor {
         // check for null
         if (this.imageInfo === null) return;
         // draw manual regions
-        if (this.regionInfoSource === RegionInfoSource.MANUAL) {
-            for (let region of this.imageInfo.regionsManual) {
-                this.imageCanvasCtx.globalAlpha = 0.5;
-                this.imageCanvasCtx.fillStyle = region.color;
-                this.imageCanvasCtx.fillRect(region.x * this.scale, region.y * this.scale, region.w * this.scale, region.h * this.scale);
-                this.imageCanvasCtx.globalAlpha = 1.0;
-            }
+        for (let region of this.imageInfo.regionsManual) {
+            // skip old generations
+            if (region.generation != this.generation) continue;
+            this.imageCanvasCtx.globalAlpha = 0.5;
+            this.imageCanvasCtx.fillStyle = region.color;
+            this.imageCanvasCtx.fillRect(region.x * this.scale, region.y * this.scale, region.w * this.scale, region.h * this.scale);
+            this.imageCanvasCtx.globalAlpha = 1.0;
         }
         // draw loaded regions
-        if (this.regionInfoSource === RegionInfoSource.LOADED) {
-            for (let region of this.imageInfo.regionsLoaded) {
-                this.imageCanvasCtx.globalAlpha = 0.5;
-                this.imageCanvasCtx.fillStyle = region.color;
-                this.imageCanvasCtx.fillRect(region.x * this.scale, region.y * this.scale, region.w * this.scale, region.h * this.scale);
-                this.imageCanvasCtx.globalAlpha = 1.0;
-            }
-        };
+        for (let region of this.imageInfo.regionsLoaded) {
+            this.imageCanvasCtx.globalAlpha = 0.5;
+            this.imageCanvasCtx.fillStyle = region.color;
+            this.imageCanvasCtx.fillRect(region.x * this.scale, region.y * this.scale, region.w * this.scale, region.h * this.scale);
+            this.imageCanvasCtx.globalAlpha = 1.0;
+        }
     }
 
     // drawImageInfo
@@ -291,7 +305,7 @@ export class ImageInfoEditor {
             this.curvesCanvas.height = this.imageInfo.canvasImage.height * this.scale;
             this.curvesCanvasCtx.fillStyle = "black";
             this.curvesCanvasCtx.fillRect(0, 0, this.curvesCanvas.width, this.curvesCanvas.height);
-            
+
             // draw curves
             //for (var i = 0; i < this.imageInfo.curves.length; i++) {
             for (let curve of this.imageInfo.curves) {

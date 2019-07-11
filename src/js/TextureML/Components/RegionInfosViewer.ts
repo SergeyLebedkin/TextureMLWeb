@@ -2,7 +2,6 @@ import { ImageInfo } from "../Types/ImageInfo"
 import { RegionInfo } from "../Types/RegionInfo"
 import { TextureID } from "../Types/TextureID"
 import { ColorMapType } from "../Types/ColorMapType";
-import { RegionInfoSource } from "../Types/RegionInfoSource";
 
 // RegionInfosViewer
 export class RegionInfosViewer {
@@ -13,8 +12,6 @@ export class RegionInfosViewer {
     private imageInfoList: Array<ImageInfo> = null;
     // color map type
     private colorMapType: ColorMapType = ColorMapType.GRAY_SCALE;
-    // region info source
-    private regionInfoSource: RegionInfoSource = RegionInfoSource.MANUAL;
     // texture id
     private textureID: TextureID = null;
     // events
@@ -26,8 +23,6 @@ export class RegionInfosViewer {
         // base lists
         this.textureIDList = textureIDList;
         this.imageInfoList = imageInfoList;
-        // region info source
-        this.regionInfoSource = RegionInfoSource.MANUAL;
         // color map type
         this.colorMapType = ColorMapType.GRAY_SCALE;
         // texture id
@@ -37,12 +32,6 @@ export class RegionInfosViewer {
     // setColorMapType
     public setColorMapType(colorMapType: ColorMapType): void {
         this.colorMapType = colorMapType;
-        this.update();
-    }
-
-    // setRegionInfoSource
-    public setRegionInfoSource(regionInfoSource: RegionInfoSource): void {
-        this.regionInfoSource = regionInfoSource;
         this.update();
     }
 
@@ -66,23 +55,20 @@ export class RegionInfosViewer {
         for (let imageInfo of this.imageInfoList) {
             let regionInfoCount = 0;
             // add manual regions
-            if (this.regionInfoSource === RegionInfoSource.MANUAL) {
-                for (let regionInfo of imageInfo.regionsManual) {
-                    if (regionInfo.ID === this.textureID.ID) {
-                        this.appendRegionInfoItem(imageInfo, regionInfo);
-                        regionInfoCount++;
-                    }
+            for (let regionInfo of imageInfo.regionsManual) {
+                if (regionInfo.ID === this.textureID.ID) {
+                    this.appendRegionInfoItem(imageInfo, regionInfo, " (manual)");
+                    regionInfoCount++;
                 }
             }
             // add loaded regions
-            if (this.regionInfoSource === RegionInfoSource.LOADED) {
-                for (let regionInfo of imageInfo.regionsLoaded) {
-                    if (regionInfo.ID === this.textureID.ID) {
-                        this.appendRegionInfoItem(imageInfo, regionInfo);
-                        regionInfoCount++;
-                    }
+            for (let regionInfo of imageInfo.regionsLoaded) {
+                if (regionInfo.ID === this.textureID.ID) {
+                    this.appendRegionInfoItem(imageInfo, regionInfo, " (generated)");
+                    regionInfoCount++;
                 }
             }
+
             // add separation line
             if (regionInfoCount > 0) {
                 let hr = document.createElement("hr");
@@ -93,7 +79,7 @@ export class RegionInfosViewer {
     }
 
     // addRegionInfoItem
-    private appendRegionInfoItem(imageInfo: ImageInfo, regionInfo: RegionInfo): void {
+    private appendRegionInfoItem(imageInfo: ImageInfo, regionInfo: RegionInfo, comment: string): void {
         // add div
         let div = document.createElement('div');
         div.style.display = "flex";
@@ -102,7 +88,7 @@ export class RegionInfosViewer {
 
         // add label
         let filaNameLabel = document.createElement('a');
-        filaNameLabel.innerText = imageInfo.fileRef.name;
+        filaNameLabel.innerText = imageInfo.fileRef.name + comment;
         filaNameLabel.style.fontSize = "16px";
         div.appendChild(filaNameLabel);
 
