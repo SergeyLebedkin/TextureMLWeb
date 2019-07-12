@@ -50,7 +50,6 @@ export class RegionInfosViewer {
             divHeader.style.width = "100%";
             divHeader.innerText = textureID.ID;
             divColumn.appendChild(divHeader);
-
             
             // scan image info list
             for (let imageInfo of this.imageInfoList) {
