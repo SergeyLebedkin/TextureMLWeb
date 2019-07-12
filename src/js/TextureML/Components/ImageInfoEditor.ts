@@ -149,6 +149,8 @@ export class ImageInfoEditor {
 
     // onMouseDown
     public onMouseDown(event: MouseEvent): void {
+        // check for left button
+        if (event.button !== 0) return;
         // set selection state and setup selection region if preview mod is MANUAL
         if (this.imageInfo !== null) {
             // get mouse coords

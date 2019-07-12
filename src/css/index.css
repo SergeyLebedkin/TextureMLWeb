@@ -40,8 +40,8 @@ html, body {
 .right-panel {
     display: flex;
     flex-direction: column;
-    min-width: 300px;
-    max-width: 300px;
+    min-width: 900px;
+    max-width: 900px;
     overflow: auto;
 }
 
@@ -63,6 +63,18 @@ html, body {
     padding: 0;
 }
 
+.preview_column {
+    overflow-y: auto; 
+    max-width: 300px; 
+    min-width: 300px
+}
+
+.preview_canvas {
+    overflow-y: auto; 
+    max-width: 300px; 
+    min-width: 300px
+}
+
 #image_canvas_panel {
     display: block;
     white-space: nowrap;
@@ -81,7 +93,7 @@ html, body {
 
 #region_preview {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     overflow: auto;
     text-align: center;
 }

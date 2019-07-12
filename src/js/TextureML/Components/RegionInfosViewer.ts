@@ -12,8 +12,6 @@ export class RegionInfosViewer {
     private imageInfoList: Array<ImageInfo> = null;
     // color map type
     private colorMapType: ColorMapType = ColorMapType.GRAY_SCALE;
-    // texture id
-    private textureID: TextureID = null;
     // events
     public onclickImageInfo: (this: RegionInfosViewer, imageInfo: ImageInfo) => any = null;
     // constructor
@@ -25,19 +23,11 @@ export class RegionInfosViewer {
         this.imageInfoList = imageInfoList;
         // color map type
         this.colorMapType = ColorMapType.GRAY_SCALE;
-        // texture id
-        this.textureID = null;
     }
 
     // setColorMapType
     public setColorMapType(colorMapType: ColorMapType): void {
         this.colorMapType = colorMapType;
-        this.update();
-    }
-
-    // setTextureID
-    public setTextureID(textureID: TextureID): void {
-        this.textureID = textureID;
         this.update();
     }
 
@@ -47,39 +37,44 @@ export class RegionInfosViewer {
         while (this.parent.firstChild)
             this.parent.removeChild(this.parent.firstChild);
 
-        // check for null
-        if (this.textureID === null)
-            return;
+        // append texture ids columns
+        for (let textureID of this.textureIDList){
+            // create column
+            let divColumn = document.createElement("div");
+            divColumn.className = "preview_column";
+            // header
+            let divHeader = document.createElement("div");
+            divHeader.className = "preview_column";
+            divHeader.style.background = textureID.color;
+            divHeader.style.fontWeight = "bold";
+            divHeader.style.width = "100%";
+            divHeader.innerText = textureID.ID;
+            divColumn.appendChild(divHeader);
 
-        // this is temporary solution. There will be previews
-        for (let imageInfo of this.imageInfoList) {
-            let regionInfoCount = 0;
-            // add manual regions
-            for (let regionInfo of imageInfo.regionsManual) {
-                if (regionInfo.ID === this.textureID.ID) {
-                    this.appendRegionInfoItem(imageInfo, regionInfo, " (manual)");
-                    regionInfoCount++;
+            
+            // scan image info list
+            for (let imageInfo of this.imageInfoList) {
+                // scan manual regions
+                for (let regionInfo of imageInfo.regionsManual) {
+                    if(regionInfo.ID === textureID.ID) {
+                        this.appendRegionInfoItem(divColumn, imageInfo, regionInfo, " (manual)");
+                    }
+                }
+                // scan manual regions
+                for (let regionInfo of imageInfo.regionsPreview) {
+                    if(regionInfo.ID === textureID.ID) {
+                        this.appendRegionInfoItem(divColumn, imageInfo, regionInfo, " (loaded)");
+                    }
                 }
             }
-            // add loaded regions
-            for (let regionInfo of imageInfo.regionsPreview) {
-                if (regionInfo.ID === this.textureID.ID) {
-                    this.appendRegionInfoItem(imageInfo, regionInfo, " (generated)");
-                    regionInfoCount++;
-                }
-            }
-
-            // add separation line
-            if (regionInfoCount > 0) {
-                let hr = document.createElement("hr");
-                hr.style.width = "90%";
-                this.parent.appendChild(hr);
-            }
+            
+            // append column
+            this.parent.appendChild(divColumn);
         }
     }
 
     // addRegionInfoItem
-    private appendRegionInfoItem(imageInfo: ImageInfo, regionInfo: RegionInfo, comment: string): void {
+    private appendRegionInfoItem(node: HTMLElement, imageInfo: ImageInfo, regionInfo: RegionInfo, comment: string): void {
         // add div
         let div = document.createElement('div');
         div.style.display = "flex";
@@ -130,6 +125,6 @@ export class RegionInfosViewer {
         div.appendChild(divCanvas);
 
         // append new canvas
-        this.parent.appendChild(div);
+        node.appendChild(div);
     }
 }

@@ -34,7 +34,6 @@ let labelScaleFactor: HTMLLabelElement = null;
 let buttonScaleDown: HTMLButtonElement = null;
 let buttonScaleUp: HTMLButtonElement = null;
 // get elements - right panel
-let selectTextureID: HTMLSelectElement = null;
 let divRegionInfosListViewer: HTMLDivElement = null;
 
 // globals
@@ -74,30 +73,6 @@ function selectImageNumberUpdate() {
     // set selected index
     if ((selectedIndex < 0) && (gImageInfoList.length > 0)) selectedIndex = 0;
     selectImageNumber.selectedIndex = selectedIndex;
-}
-
-// selectTextureIDUpdate
-function selectTextureIDUpdate() {
-    // get selected index
-    var selectedIndex = selectTextureID.selectedIndex;
-    // clear childs
-    while (selectTextureID.firstChild) { selectTextureID.removeChild(selectTextureID.firstChild); }
-
-    // add items
-    for (let textureID of gTextureIDList) {
-        // create new selector
-        let textureIDOption = document.createElement('option');
-        textureIDOption["textureID"] = textureID;
-        textureIDOption.innerHTML = textureID.ID + ": " + textureID.name;
-        selectTextureID.appendChild(textureIDOption);
-    }
-    // set selected value
-    if ((selectedIndex < 0) && (gTextureIDList.length > 0)) {
-        selectTextureID.selectedIndex = 0;
-        gRegionInfosViewer.setTextureID(gTextureIDList[selectTextureID.selectedIndex])
-    } else {
-        selectTextureID.selectedIndex = selectedIndex;
-    }
 }
 
 // buttonLoadImagesOnClick
@@ -159,7 +134,7 @@ function buttonAddTextureIDOnClick(event) {
     let color = generateRandomColor();
     gTextureIDList.push(new TextureID(id, color));
     gTextureIDListView.update();
-    selectTextureIDUpdate();
+    gRegionInfosViewer.update();
 }
 
 // buttonSubmitOnClick
@@ -242,7 +217,6 @@ window.onload = event => {
     buttonScaleDown = document.getElementById("buttonScaleDown") as HTMLButtonElement;
     buttonScaleUp = document.getElementById("buttonScaleUp") as HTMLButtonElement;
     // get elements - right panel
-    selectTextureID = document.getElementById("selectTextureID") as HTMLSelectElement;
     divRegionInfosListViewer = document.getElementById("region_preview") as HTMLDivElement;
 
     // create global objects
@@ -268,13 +242,11 @@ window.onload = event => {
     // create texture ID list viewer
     gTextureIDListView = new TextureIDListView(divTextureIDListContainer, gTextureIDList);
     gTextureIDListView.onchangedTextureID = textureID => gImageInfoEditor.setTextureID(textureID);
-    gTextureIDListView.onchangedDescription = textureID => selectTextureIDUpdate();
+    gTextureIDListView.onchangedDescription = textureID => gRegionInfosViewer.update();
     // create region infos viewer
     gRegionInfosViewer = new RegionInfosViewer(divRegionInfosListViewer, gTextureIDList, gImageInfoList);
     gRegionInfosViewer.onclickImageInfo = imageInfo => setCurrentImageInfo(imageInfo);
-    gRegionInfosViewer.setTextureID(gTextureIDList[0]);
-    // update
-    selectTextureIDUpdate();
+    gRegionInfosViewer.update();
 
     // init session
     inputSessionID.value = gSessionInfo.sessionID;
@@ -299,8 +271,6 @@ window.onload = event => {
     inputDescription.oninput = event => gSessionInfo.description = inputDescription.value;
     buttonScaleDown.onclick = event => buttonScaleDownOnClick(event);
     buttonScaleUp.onclick = event => buttonScaleUpOnClick(event);
-    // right panel events
-    selectTextureID.onchange = (event) => gRegionInfosViewer.setTextureID(selectTextureID.options[selectTextureID.selectedIndex]["textureID"]);
 }
 
 // parceRegionsResponse
