@@ -311,35 +311,56 @@ function parceRegionsResponse(response: string): void {
         // cleare all curves
         gImageInfoList.forEach(ImageInfo => ImageInfo.curves.forEach(curve => curve.points = []));
         gImageInfoList.forEach(ImageInfo => ImageInfo.regionsLoaded = []);
+        gImageInfoList.forEach(ImageInfo => ImageInfo.regionsPreview = []);
         // get results
         let eval_results = data["eval_results"];
-        // get main nodes
-        let basenames = eval_results["basename"];
-        let cropnames = eval_results["cropname"];
-        let emb0s = eval_results["emb0"];
-        let emb1s = eval_results["emb1"];
-        let emb2s = eval_results["emb2"];
-        let ids = eval_results["id"];
-        let labels = eval_results["label"];
-        let pixel_starts = eval_results["pixel_start"];
-        let pixel_ends = eval_results["pixel_end"];
-        for (let basename in basenames) {
-            let imageInfo: ImageInfo = gImageInfoList.find(imageInfo => imageInfo.baseName == basenames[basename]);
-            //let textureID: TextureID = gTextureIDList.find(textureID => textureID.ID == labels[basename]);
-            let textureID: TextureID = gTextureIDList[labels[basename]];
-            if (imageInfo) {
-                let emb0: number = emb0s[basename];
-                let emb1: number = emb1s[basename];
-                let emb2: number = emb2s[basename];
-                let pixel_start: number = pixel_starts[basename];
-                let pixel_end: number = pixel_ends[basename];
-                imageInfo.curves[0].color = "blue";
-                imageInfo.curves[1].color = "red";
-                imageInfo.curves[2].color = "green";
-                imageInfo.curves[0].points.push(new CurvePoint(emb0, (pixel_end + pixel_start) / 2));
-                imageInfo.curves[1].points.push(new CurvePoint(emb1, (pixel_end + pixel_start) / 2));
-                imageInfo.curves[2].points.push(new CurvePoint(emb2, (pixel_end + pixel_start) / 2));
-                imageInfo.regionsLoaded.push(new RegionInfo(0, pixel_start, imageInfo.canvasImage.width, pixel_end - pixel_start, textureID.ID, textureID.color));
+        if (eval_results) {
+            // get main nodes
+            let basenames = eval_results["basename"];
+            let cropnames = eval_results["cropname"];
+            let emb0s = eval_results["emb0"];
+            let emb1s = eval_results["emb1"];
+            let emb2s = eval_results["emb2"];
+            let ids = eval_results["id"];
+            let labels = eval_results["label"];
+            let pixel_starts = eval_results["pixel_start"];
+            let pixel_ends = eval_results["pixel_end"];
+            for (let basename in basenames) {
+                let imageInfo: ImageInfo = gImageInfoList.find(imageInfo => imageInfo.baseName == basenames[basename]);
+                //let textureID: TextureID = gTextureIDList.find(textureID => textureID.ID == labels[basename]);
+                let textureID: TextureID = gTextureIDList[labels[basename]];
+                if (imageInfo) {
+                    let emb0: number = emb0s[basename];
+                    let emb1: number = emb1s[basename];
+                    let emb2: number = emb2s[basename];
+                    let pixel_start: number = pixel_starts[basename];
+                    let pixel_end: number = pixel_ends[basename];
+                    imageInfo.curves[0].color = "blue";
+                    imageInfo.curves[1].color = "red";
+                    imageInfo.curves[2].color = "green";
+                    imageInfo.curves[0].points.push(new CurvePoint(emb0, (pixel_end + pixel_start) / 2));
+                    imageInfo.curves[1].points.push(new CurvePoint(emb1, (pixel_end + pixel_start) / 2));
+                    imageInfo.curves[2].points.push(new CurvePoint(emb2, (pixel_end + pixel_start) / 2));
+                    imageInfo.regionsLoaded.push(new RegionInfo(0, pixel_start, imageInfo.canvasImage.width, pixel_end - pixel_start, textureID.ID, textureID.color));
+                }
+            }
+        }
+        let texture_preview = data["texture_preview"];
+        if (texture_preview) {
+            // get main nodes
+            let basenames = texture_preview["basename"];
+            let labels = texture_preview["label"];
+            let pixel_starts = texture_preview["pixel_start"];
+            let pixel_ends = texture_preview["pixel_end"];
+            for (let basename in basenames) {
+                let imageInfo: ImageInfo = gImageInfoList.find(imageInfo => imageInfo.baseName == basenames[basename]);
+                //let textureID: TextureID = gTextureIDList.find(textureID => textureID.ID == labels[basename]);
+                let textureID: TextureID = gTextureIDList[labels[basename]];
+                if (imageInfo) {
+                    let pixel_start: number = pixel_starts[basename];
+                    let pixel_end: number = pixel_ends[basename];
+                    imageInfo.regionsPreview.push(new RegionInfo(0, pixel_start, imageInfo.canvasImage.width, pixel_end - pixel_start, textureID.ID, textureID.color));
+                }
             }
         }
     }

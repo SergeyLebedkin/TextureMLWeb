@@ -62,7 +62,7 @@ export class RegionInfosViewer {
                 }
             }
             // add loaded regions
-            for (let regionInfo of imageInfo.regionsLoaded) {
+            for (let regionInfo of imageInfo.regionsPreview) {
                 if (regionInfo.ID === this.textureID.ID) {
                     this.appendRegionInfoItem(imageInfo, regionInfo, " (generated)");
                     regionInfoCount++;

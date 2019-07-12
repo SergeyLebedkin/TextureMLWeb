@@ -12,6 +12,7 @@ export class ImageInfo {
     // data
     public regionsManual: Array<RegionInfo> = [];
     public regionsLoaded: Array<RegionInfo> = [];
+    public regionsPreview: Array<RegionInfo> = [];
     public curves: Array<Curve> = [];
     // events
     public onloadImageFile: (this: ImageInfo, imageInfo: ImageInfo) => any = null;
@@ -26,6 +27,7 @@ export class ImageInfo {
         // data
         this.regionsManual = [];
         this.regionsLoaded = [];
+        this.regionsPreview = [];
         this.curves = [new Curve(), new Curve(), new Curve()];
         // events
         this.onloadImageFile = null;
