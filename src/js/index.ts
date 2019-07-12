@@ -297,8 +297,8 @@ function parceRegionsResponse(response: string): void {
             let pixel_ends = eval_results["pixel_end"];
             for (let basename in basenames) {
                 let imageInfo: ImageInfo = gImageInfoList.find(imageInfo => imageInfo.baseName == basenames[basename]);
-                //let textureID: TextureID = gTextureIDList.find(textureID => textureID.ID == labels[basename]);
-                let textureID: TextureID = gTextureIDList[labels[basename]];
+                let textureID: TextureID = gTextureIDList.find(textureID => textureID.ID == labels[basename]);
+                //let textureID: TextureID = gTextureIDList[labels[basename]];
                 if (imageInfo) {
                     let emb0: number = emb0s[basename];
                     let emb1: number = emb1s[basename];
@@ -324,8 +324,8 @@ function parceRegionsResponse(response: string): void {
             let pixel_ends = texture_preview["pixel_end"];
             for (let basename in basenames) {
                 let imageInfo: ImageInfo = gImageInfoList.find(imageInfo => imageInfo.baseName == basenames[basename]);
-                //let textureID: TextureID = gTextureIDList.find(textureID => textureID.ID == labels[basename]);
-                let textureID: TextureID = gTextureIDList[labels[basename]];
+                let textureID: TextureID = gTextureIDList.find(textureID => textureID.ID == labels[basename]);
+                //let textureID: TextureID = gTextureIDList[labels[basename]];
                 if (imageInfo) {
                     let pixel_start: number = pixel_starts[basename];
                     let pixel_end: number = pixel_ends[basename];
