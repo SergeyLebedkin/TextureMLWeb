@@ -28,11 +28,21 @@ export class SessionInfo {
                     resolve(xhr.responseText);
                 }
             };
+            xhr.onerror = event => {
+                console.log("postSession onerror " + xhr.responseText);
+                reject("postSession onerror " + xhr.responseText);
+            };
             // generate request data
             let data = JSON.stringify({
                 "session_id": this.sessionID
             });
-            xhr.send(data);
+            try {
+                xhr.send(data);
+            } catch (error) {
+                console.log("catch", error)
+                reject(error)
+            }
+            
         });
     }
 
@@ -49,6 +59,10 @@ export class SessionInfo {
                         resolve(xhr.responseText);
                     }
                 }
+                xhr.onerror = event => {
+                    console.log("Server Error", xhr.status)
+                    reject(xhr.status);
+                };
                 // generate request data
                 let data = JSON.stringify({
                     "session_id": this.sessionID,
@@ -72,6 +86,10 @@ export class SessionInfo {
                     resolve(xhr.responseText);
                 }
             }
+            xhr.onerror = event => {
+                console.log("Server Error", xhr.status)
+                reject(xhr.status);
+            };
             let dataJSON = {
                 session_id: this.sessionID,
                 regions: {}

@@ -4,6 +4,9 @@
 <head>
     <title>TextureMLWeb</title>
     <link rel="stylesheet" type="text/css" href="static/css/index.css">
+    <!-- PLEASE, REMOVE THIS COMMENT BEFORE YOU UPLOAD TO THE BACKEND
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename = 'css/index.css') }}">
+    -->
 </head>
 
 <body>
@@ -82,6 +85,8 @@
             <div class="menu-item-title">3. Submit</div>
             <div class="bordered-panel">
                 <button id="buttonSubmit" class="left-panel-button">Submit</button>
+                <a id="aStatusLabel">Status:</a>
+                <a id="aStatus">OK</a>
             </div>
             <!-- Load regions -->
             <div class="menu-item-title">4. Save</div>
@@ -109,11 +114,14 @@
         <!-- right-panel -->
         <div class="right-panel">
             <div id="region_preview">
-                
+
             </div>
         </div>
     </div>
     <script type="text/javascript" src="<%= htmlWebpackPlugin.files.chunks.index.entry %>"></script>
+    <!-- PLEASE, REMOVE THIS COMMENT BEFORE YOU UPLOAD TO THE BACKEND
+    <script type="text/javascript" src="{{ url_for('static', filename = 'js/index.js') }}"></script>
+    -->
 </body>
 
 </html>

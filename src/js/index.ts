@@ -9,6 +9,7 @@ import { TextureIDListView } from "./TextureML/Components/TextureIDListViewer";
 import { ImageInfoListViewer } from "./TextureML/Components/ImageInfoListViewer";
 import { RegionInfosViewer } from "./TextureML/Components/RegionInfosViewer";
 import { CurvePoint } from "./TextureML/Types/CurvePoint";
+import { setTimeout } from "timers";
 
 // get elements - left panel
 let divImageInfoPanel: HTMLDivElement = null;
@@ -29,6 +30,7 @@ let divTextureIDListContainer: HTMLDivElement = null;
 let buttonAddTextureID: HTMLInputElement = null;
 let buttonSubmit: HTMLButtonElement = null;
 let buttonSave: HTMLButtonElement = null;
+let aStatus: HTMLElement = null;
 // get elements - center panel
 let labelScaleFactor: HTMLLabelElement = null;
 let buttonScaleDown: HTMLButtonElement = null;
@@ -140,17 +142,54 @@ function buttonAddTextureIDOnClick(event) {
 // buttonSubmitOnClick
 function buttonSubmitOnClick(event) {
     if (gImageInfoEditor.imageInfo) {
+        let timeoutServerWait = setTimeout(() => {
+            aStatus.style.color = "red";
+            aStatus.innerText = "Server error...";
+            buttonSubmit.disabled = false;
+        }, 1000*5*60);
+        aStatus.style.color = "blue";
+        aStatus.innerText = "Post SessionID...";
+        buttonSubmit.disabled = true;
         gSessionInfo.postSession()
-            .then(result => gSessionInfo.postImages(gImageInfoList))
-            .then(result => gSessionInfo.postRegions(gImageInfoList))
-            .then(result => {
-                parceRegionsResponse(result);
+            .then(value => {
+                aStatus.style.color = "blue";
+                aStatus.innerText = "Post Images...";
+                return gSessionInfo.postImages(gImageInfoList);
+            }, reason => {
+                aStatus.style.color = "red";
+                aStatus.innerText = "Server error...";
+                buttonSubmit.disabled = false;
+                clearTimeout(timeoutServerWait);
+                return Promise.reject(reason);
+            })
+            .then(value => {
+                aStatus.style.color = "blue";
+                aStatus.innerText = "Working...";
+                return gSessionInfo.postRegions(gImageInfoList)
+            }, reason => {
+                aStatus.style.color = "red";
+                aStatus.innerText = "Server error...";
+                buttonSubmit.disabled = false;
+                clearTimeout(timeoutServerWait);
+                return Promise.reject(reason);
+            })
+            .then(value => {
+                parceRegionsResponse(value);
                 buttonSave.disabled = false;
                 gCurrentGeneration++;
                 gImageInfoEditor.setPermitOverlapping(true);
                 gImageInfoEditor.setGeneration(gCurrentGeneration);
                 gImageInfoEditor.drawImageInfo();
                 gRegionInfosViewer.update()
+                aStatus.style.color = "green";
+                aStatus.innerText = "OK"
+                buttonSubmit.disabled = false;
+                clearTimeout(timeoutServerWait);
+            }, reason => {
+                aStatus.style.color = "red";
+                aStatus.innerText = "Server error...";
+                buttonSubmit.disabled = false;
+                clearTimeout(timeoutServerWait);
             });
     }
 }
@@ -212,6 +251,7 @@ window.onload = event => {
     buttonAddTextureID = document.getElementById("buttonAddTextureID") as HTMLInputElement;
     buttonSubmit = document.getElementById("buttonSubmit") as HTMLButtonElement;
     buttonSave = document.getElementById("buttonSave") as HTMLButtonElement;
+    aStatus = document.getElementById("aStatus") as HTMLElement;
     // get elements - center panel
     labelScaleFactor = document.getElementById("labelScaleFactor") as HTMLLabelElement;
     buttonScaleDown = document.getElementById("buttonScaleDown") as HTMLButtonElement;
