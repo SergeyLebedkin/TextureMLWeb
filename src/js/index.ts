@@ -157,7 +157,7 @@ function buttonSubmitOnClick(event) {
                 return gSessionInfo.postImages(gImageInfoList);
             }, reason => {
                 aStatus.style.color = "red";
-                aStatus.innerText = "Server error...";
+                aStatus.innerText = "Server error... (" + reason + ")";
                 buttonSubmit.disabled = false;
                 clearTimeout(timeoutServerWait);
                 return Promise.reject(reason);
@@ -168,7 +168,7 @@ function buttonSubmitOnClick(event) {
                 return gSessionInfo.postRegions(gImageInfoList)
             }, reason => {
                 aStatus.style.color = "red";
-                aStatus.innerText = "Server error...";
+                aStatus.innerText = "Server error... (" + reason + ")";
                 buttonSubmit.disabled = false;
                 clearTimeout(timeoutServerWait);
                 return Promise.reject(reason);
@@ -187,7 +187,7 @@ function buttonSubmitOnClick(event) {
                 clearTimeout(timeoutServerWait);
             }, reason => {
                 aStatus.style.color = "red";
-                aStatus.innerText = "Server error...";
+                aStatus.innerText = "Server error... (" + reason + ")";
                 buttonSubmit.disabled = false;
                 clearTimeout(timeoutServerWait);
             });

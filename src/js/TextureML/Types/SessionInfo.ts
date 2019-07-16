@@ -25,7 +25,11 @@ export class SessionInfo {
             xhr.setRequestHeader("Content-Type", "application/json");
             xhr.onreadystatechange = event => {
                 if (xhr.readyState === 4 && xhr.status === 200) {
-                    resolve(xhr.responseText);
+                    let responseData = JSON.parse(xhr.responseText);
+                    if (responseData.success)
+                        resolve(xhr.responseText)
+                    else
+                        reject(responseData.Error);
                 }
             };
             xhr.onerror = event => {
@@ -42,7 +46,7 @@ export class SessionInfo {
                 console.log("catch", error)
                 reject(error)
             }
-            
+
         });
     }
 
@@ -56,13 +60,14 @@ export class SessionInfo {
                 xhr.setRequestHeader("Content-Type", "application/json");
                 xhr.onreadystatechange = event => {
                     if (xhr.readyState === 4 && xhr.status === 200) {
-                        resolve(xhr.responseText);
+                        let responseData = JSON.parse(xhr.responseText);
+                        if (responseData.success)
+                            resolve(xhr.responseText)
+                        else
+                            reject(responseData.Error);
                     }
                 }
-                xhr.onerror = event => {
-                    console.log("Server Error", xhr.status)
-                    reject(xhr.status);
-                };
+                xhr.onerror = event => { reject(xhr.status); };
                 // generate request data
                 let data = JSON.stringify({
                     "session_id": this.sessionID,
@@ -83,7 +88,11 @@ export class SessionInfo {
             xhr.setRequestHeader("Content-Type", "application/json");
             xhr.onreadystatechange = event => {
                 if (xhr.readyState === 4 && xhr.status === 200) {
-                    resolve(xhr.responseText);
+                    let responseData = JSON.parse(xhr.responseText)
+                    if (responseData.success)
+                        resolve(xhr.responseText)
+                    else
+                        reject(responseData.Error);
                 }
             }
             xhr.onerror = event => {
