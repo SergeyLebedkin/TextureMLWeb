@@ -46,7 +46,6 @@ export class SessionInfo {
                 console.log("catch", error)
                 reject(error)
             }
-
         });
     }
 
