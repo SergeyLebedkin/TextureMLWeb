@@ -144,7 +144,7 @@ function buttonSubmitOnClick(event) {
     if (gImageInfoEditor.imageInfo) {
         let timeoutServerWait = setTimeout(() => {
             aStatus.style.color = "red";
-            aStatus.innerText = "Server error...";
+            aStatus.innerText = "Server timeout...";
             buttonSubmit.disabled = false;
         }, 1000*5*60);
         aStatus.style.color = "blue";
