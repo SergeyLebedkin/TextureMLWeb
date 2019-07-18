@@ -213,7 +213,7 @@ function buttonSaveOnClick(event: MouseEvent) {
         }
     }
     // download file
-    downloadFile(regionsString, 'regions.txt', 'text/plain');
+    downloadFile(regionsString, 'regions.csv', 'text/plain');
 }
 
 // buttonScaleDownOnClick
