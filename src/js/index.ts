@@ -10,10 +10,9 @@ import { ImageInfoListViewer } from "./TextureML/Components/ImageInfoListViewer"
 import { RegionInfosViewer } from "./TextureML/Components/RegionInfosViewer";
 import { CurvePoint } from "./TextureML/Types/CurvePoint";
 import { setTimeout } from "timers";
+import { RegionsStatInfoPanel } from "./TextureML/Components/RegionsStatInfoPanel";
 
 // get elements - left panel
-let divImageInfoPanel: HTMLDivElement = null;
-let divImageInfoPreviewPanel: HTMLDivElement = null;
 let inputUsername: HTMLInputElement = null;
 let inputSessionID: HTMLInputElement = null;
 let inputDescription: HTMLInputElement = null;
@@ -35,6 +34,9 @@ let aStatus: HTMLElement = null;
 let labelScaleFactor: HTMLLabelElement = null;
 let buttonScaleDown: HTMLButtonElement = null;
 let buttonScaleUp: HTMLButtonElement = null;
+let divImageInfoPanel: HTMLDivElement = null;
+let divImageInfoPreviewPanel: HTMLDivElement = null;
+let divRegionsStatInfoPanel: HTMLDivElement = null;
 // get elements - right panel
 let divRegionInfosListViewer: HTMLDivElement = null;
 
@@ -47,6 +49,7 @@ let gCurrentGeneration: number = 0;
 // components
 let gImageInfoEditor: ImageInfoEditor = null;
 let gImageInfoListViewer: ImageInfoListViewer = null;
+let gRegionsStatInfoPanel: RegionsStatInfoPanel = null;
 let gTextureIDListView: TextureIDListView = null;
 let gRegionInfosViewer: RegionInfosViewer = null;
 
@@ -233,8 +236,6 @@ function buttonScaleUpOnClick(event: MouseEvent) {
 // window.onload
 window.onload = event => {
     // get elements - left panel
-    divImageInfoPanel = document.getElementById("image_canvas_panel") as HTMLDivElement;
-    divImageInfoPreviewPanel = document.getElementById("image_preview_canvas_panel") as HTMLDivElement;
     inputUsername = document.getElementById("inputUsername") as HTMLInputElement;
     inputSessionID = document.getElementById("inputSessionID") as HTMLInputElement;
     inputDescription = document.getElementById("inputDescription") as HTMLInputElement;
@@ -256,6 +257,9 @@ window.onload = event => {
     labelScaleFactor = document.getElementById("labelScaleFactor") as HTMLLabelElement;
     buttonScaleDown = document.getElementById("buttonScaleDown") as HTMLButtonElement;
     buttonScaleUp = document.getElementById("buttonScaleUp") as HTMLButtonElement;
+    divImageInfoPanel = document.getElementById("image_canvas_panel") as HTMLDivElement;
+    divImageInfoPreviewPanel = document.getElementById("image_preview_canvas_panel") as HTMLDivElement;
+    divRegionsStatInfoPanel = document.getElementById("regions_stat_info_panel") as HTMLDivElement;
     // get elements - right panel
     divRegionInfosListViewer = document.getElementById("region_preview") as HTMLDivElement;
 
@@ -273,12 +277,15 @@ window.onload = event => {
 
     // create image info editor
     gImageInfoEditor = new ImageInfoEditor(divImageInfoPanel);
-    gImageInfoEditor.onchangedImageInfo = imageInfo => { gRegionInfosViewer.update(); buttonSave.disabled = true; }
+    gImageInfoEditor.onchangedImageInfo = imageInfo => { gRegionInfosViewer.update(); gRegionsStatInfoPanel.update(); buttonSave.disabled = true; }
     gImageInfoEditor.setTextureID(gTextureIDList[0]);
     // create image info list viewer
     gImageInfoListViewer = new ImageInfoListViewer(divImageInfoPreviewPanel, gImageInfoList);
     gImageInfoListViewer.onclickImageInfo = imageInfo => setCurrentImageInfo(imageInfo);
     divImageInfoPreviewPanel.style.display = "none";
+    // cerate regions stat info panel
+    gRegionsStatInfoPanel = new RegionsStatInfoPanel(divRegionsStatInfoPanel, gTextureIDList, gImageInfoList);
+    gRegionsStatInfoPanel.update();
     // create texture ID list viewer
     gTextureIDListView = new TextureIDListView(divTextureIDListContainer, gTextureIDList);
     gTextureIDListView.onchangedTextureID = textureID => gImageInfoEditor.setTextureID(textureID);
