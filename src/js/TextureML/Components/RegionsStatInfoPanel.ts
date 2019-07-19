@@ -57,6 +57,10 @@ export class RegionsStatInfoPanel {
         // add info
         this.infoCanvas.width = 256;
         this.infoCanvas.height = this.values.size * 16;
+        this.infoCanvasCtx.globalAlpha = 0.2;
+        this.infoCanvasCtx.fillStyle = "white";
+        this.infoCanvasCtx.fillRect(0, 0, this.infoCanvas.width, this.infoCanvas.height);
+        this.infoCanvasCtx.globalAlpha = 1.0;
         let index = 0;
         this.values.forEach((val, id) => {
             let color = this.textureIDList.find(textureID => textureID.ID === id).color
@@ -64,7 +68,7 @@ export class RegionsStatInfoPanel {
             //this.values.keys[index]
             this.infoCanvasCtx.strokeStyle  = color;
             this.infoCanvasCtx.fillStyle  = color;
-            this.infoCanvasCtx.lineWidth = 5;
+            this.infoCanvasCtx.lineWidth = 6;
             this.infoCanvasCtx.beginPath();
             this.infoCanvasCtx.moveTo(0, index*16+8);
             this.infoCanvasCtx.lineTo(Math.min((val/2000), 1)*256, index*16+8);
