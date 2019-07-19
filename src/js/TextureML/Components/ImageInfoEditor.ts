@@ -102,7 +102,7 @@ export class ImageInfoEditor {
                             this.onchangedImageInfo(this.imageInfo);
                     }
                     else // check size restrictions for regular images
-                        if ((regionInfo.w > 100) && (regionInfo.h > 200)) {
+                        if ((regionInfo.w > 100) && (regionInfo.h > 10)) {
                             if (!this.permitOverlapping)
                                 this.removeRegionsInArea(this.selectionRegionInfo);
                             this.imageInfo.regionsManual.push(regionInfo);
@@ -110,11 +110,11 @@ export class ImageInfoEditor {
                                 this.onchangedImageInfo(this.imageInfo);
                         }
                         else {
-                            if ((regionInfo.w <= 100) && (regionInfo.h <= 200)) {
+                            if ((regionInfo.w <= 100) && (regionInfo.h <= 10)) {
                                 window.alert("Region is too small")
                             } else if (regionInfo.w <= 100) {
                                 window.alert("Width is too small")
-                            } else if (regionInfo.h <= 200) {
+                            } else if (regionInfo.h <= 10) {
                                 window.alert("Height is too small")
                             }
                         }
