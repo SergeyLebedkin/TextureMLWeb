@@ -55,25 +55,38 @@ export class RegionsStatInfoPanel {
     // redraw
     public redraw(): void {
         // add info
-        this.infoCanvas.width = 256;
-        this.infoCanvas.height = this.values.size * 16;
+        this.infoCanvas.width = 200;
+        this.infoCanvas.height = this.values.size * 16 + 10;
         this.infoCanvasCtx.globalAlpha = 0.2;
         this.infoCanvasCtx.fillStyle = "white";
         this.infoCanvasCtx.fillRect(0, 0, this.infoCanvas.width, this.infoCanvas.height);
         this.infoCanvasCtx.globalAlpha = 1.0;
-        let index = 0;
+        let index = this.values.size - 1;
         this.values.forEach((val, id) => {
+            let y = index * 16 + 8;
+            let x = Math.min((val / 2000), 1) * this.infoCanvas.width;
             let color = this.textureIDList.find(textureID => textureID.ID === id).color
             //this.values.values[index]
             //this.values.keys[index]
-            this.infoCanvasCtx.strokeStyle  = color;
-            this.infoCanvasCtx.fillStyle  = color;
-            this.infoCanvasCtx.lineWidth = 6;
+            this.infoCanvasCtx.strokeStyle = color;
+            this.infoCanvasCtx.fillStyle = color;
+            this.infoCanvasCtx.lineWidth = 12;
             this.infoCanvasCtx.beginPath();
-            this.infoCanvasCtx.moveTo(0, index*16+8);
-            this.infoCanvasCtx.lineTo(Math.min((val/2000), 1)*256, index*16+8);
+            this.infoCanvasCtx.moveTo(this.infoCanvas.width, y);
+            this.infoCanvasCtx.lineTo(this.infoCanvas.width - x, y);
             this.infoCanvasCtx.stroke();
-            index++;
+            index--;
         });
+        this.infoCanvasCtx.fillStyle = "white";
+        this.infoCanvasCtx.strokeStyle = "white";
+        this.infoCanvasCtx.font = "10px Arial";
+        this.infoCanvasCtx.fillText("Texture Area Requirements", 0, this.infoCanvas.height - 2);
+    }
+
+    // checkRequirement
+    public checkRequirement(): boolean {
+        let ok = this.values.size > 0;
+        this.values.forEach((val, id) => { if (val < 2000) ok = false });
+        return ok;
     }
 }

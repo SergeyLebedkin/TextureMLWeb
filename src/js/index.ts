@@ -233,6 +233,11 @@ function buttonScaleUpOnClick(event: MouseEvent) {
     labelScaleFactor.innerText = Math.round(gImageInfoEditor.scale * 100) + "%";
 }
 
+// checkRegionRequirements
+function checkRegionRequirements() {
+    buttonSubmit.disabled = !gRegionsStatInfoPanel.checkRequirement();
+}
+
 // window.onload
 window.onload = event => {
     // get elements - left panel
@@ -277,7 +282,7 @@ window.onload = event => {
 
     // create image info editor
     gImageInfoEditor = new ImageInfoEditor(divImageInfoPanel);
-    gImageInfoEditor.onchangedImageInfo = imageInfo => { gRegionInfosViewer.update(); gRegionsStatInfoPanel.update(); buttonSave.disabled = true; }
+    gImageInfoEditor.onchangedImageInfo = imageInfo => { gRegionInfosViewer.update(); gRegionsStatInfoPanel.update(); checkRegionRequirements(); buttonSave.disabled = true; }
     gImageInfoEditor.setTextureID(gTextureIDList[0]);
     // create image info list viewer
     gImageInfoListViewer = new ImageInfoListViewer(divImageInfoPreviewPanel, gImageInfoList);
@@ -318,6 +323,9 @@ window.onload = event => {
     inputDescription.oninput = event => gSessionInfo.description = inputDescription.value;
     buttonScaleDown.onclick = event => buttonScaleDownOnClick(event);
     buttonScaleUp.onclick = event => buttonScaleUpOnClick(event);
+
+    // some preparations
+    checkRegionRequirements();
 }
 
 // parceRegionsResponse
