@@ -4,6 +4,8 @@ import { TextureID } from "../Types/TextureID"
 import { stringify } from "querystring";
 import { deflateRaw } from "zlib";
 
+export const REGION_MIN_AREA_CRITERIA: number = 1000;
+
 // RegionsStatInfoPanel
 export class RegionsStatInfoPanel {
     // parent
@@ -64,7 +66,7 @@ export class RegionsStatInfoPanel {
         let index = this.values.size - 1;
         this.values.forEach((val, id) => {
             let y = index * 16 + 8;
-            let x = Math.min((val / 2000), 1) * this.infoCanvas.width;
+            let x = Math.min((val / REGION_MIN_AREA_CRITERIA), 1) * this.infoCanvas.width;
             let color = this.textureIDList.find(textureID => textureID.ID === id).color
             //this.values.values[index]
             //this.values.keys[index]
@@ -86,7 +88,7 @@ export class RegionsStatInfoPanel {
     // checkRequirement
     public checkRequirement(): boolean {
         let ok = this.values.size > 0;
-        this.values.forEach((val, id) => { if (val < 2000) ok = false });
+        this.values.forEach((val, id) => { if (val < REGION_MIN_AREA_CRITERIA) ok = false });
         return ok;
     }
 }
