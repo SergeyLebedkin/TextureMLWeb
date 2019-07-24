@@ -1,8 +1,5 @@
 import { ImageInfo } from "../Types/ImageInfo"
-import { RegionInfo } from "../Types/RegionInfo"
 import { TextureID } from "../Types/TextureID"
-import { stringify } from "querystring";
-import { deflateRaw } from "zlib";
 
 export const REGION_MIN_AREA_CRITERIA: number = 1000;
 
