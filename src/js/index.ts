@@ -23,6 +23,7 @@ let radioGrayScale: HTMLInputElement = null;
 let radioColorMapJet: HTMLInputElement = null;
 let radioEdit: HTMLInputElement = null;
 let radioPreview: HTMLInputElement = null;
+let checkboxShowOriginal: HTMLInputElement = null;
 let radioSelectionModeAdd: HTMLInputElement = null;
 let radioSelectionModeRemove: HTMLInputElement = null;
 let divTextureIDListContainer: HTMLDivElement = null;
@@ -251,6 +252,7 @@ window.onload = event => {
     radioColorMapJet = document.getElementById("radioColorMapJet") as HTMLInputElement;
     radioEdit = document.getElementById("radioEdit") as HTMLInputElement;
     radioPreview = document.getElementById("radioPreview") as HTMLInputElement;
+    checkboxShowOriginal = document.getElementById("checkboxShowOriginal") as HTMLInputElement;
     radioSelectionModeAdd = document.getElementById("radioSelectionModeAdd") as HTMLInputElement;
     radioSelectionModeRemove = document.getElementById("radioSelectionModeRemove") as HTMLInputElement;
     divTextureIDListContainer = document.getElementById("divTextureIDListContainer") as HTMLDivElement;
@@ -310,6 +312,7 @@ window.onload = event => {
     radioColorMapJet.onchange = event => radioColorMapJetOnChange(event);
     radioEdit.onchange = event => radioEditOnChange(event);
     radioPreview.onchange = event => radioPreviewOnChange(event);
+    checkboxShowOriginal.onchange = event => gImageInfoEditor.setShowOriginalImage(checkboxShowOriginal.checked);
     radioSelectionModeAdd.onchange = event => gImageInfoEditor.setSelectionMode(SelectionMode.ADD);
     radioSelectionModeRemove.onchange = event => gImageInfoEditor.setSelectionMode(SelectionMode.REMOVE);
     buttonAddTextureID.onclick = event => buttonAddTextureIDOnClick(event);

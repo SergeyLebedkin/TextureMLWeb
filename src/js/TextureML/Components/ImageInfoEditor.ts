@@ -21,6 +21,7 @@ export class ImageInfoEditor {
     public textureID: TextureID = null;
     // scale
     public scale: number = 1.0;
+    private showOriginalImage: boolean = false;
     // selection
     private selectionStarted: boolean = false;
     private selectionMode: SelectionMode = SelectionMode.ADD;
@@ -58,6 +59,7 @@ export class ImageInfoEditor {
         this.textureID = null;
         // scale
         this.scale = 1.0;
+        this.showOriginalImage = false;
         // selection
         this.selectionStarted = false;
         this.selectionMode = SelectionMode.ADD;
@@ -192,6 +194,12 @@ export class ImageInfoEditor {
         }
     }
 
+    // setShowOriginalImage
+    public setShowOriginalImage(showOriginal: boolean): void {
+        this.showOriginalImage = showOriginal;
+        this.drawImageInfo();
+    }
+
     // setColorMapType
     public setColorMapType(colorMapType: ColorMapType): void {
         this.colorMapType = colorMapType;
@@ -294,7 +302,8 @@ export class ImageInfoEditor {
         if (this.colorMapType === ColorMapType.JET)
             this.imageCanvasCtx.drawImage(this.imageInfo.canvasImageJet, 0, 0, this.imageCanvas.width, this.imageCanvas.height);
         // draw image info regions
-        this.drawImageInfoRegions();
+        if (!this.showOriginalImage)
+            this.drawImageInfoRegions();
         // draw curves
         this.drawCurves();
     }
