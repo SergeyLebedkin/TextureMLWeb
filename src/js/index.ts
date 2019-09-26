@@ -202,7 +202,7 @@ function buttonSubmitOnClick(event) {
 function buttonSaveOnClick(event: MouseEvent) {
     var regionsString = '';
     for (let imageInfo of gImageInfoList) {
-        let step = (imageInfo.maxHeight - imageInfo.minHeight) / imageInfo.regionsLoaded.length;
+        let step = (imageInfo.maxHeight - imageInfo.minHeight) / (imageInfo.regionsLoaded.length - 1);
         for (let i = 0; i < imageInfo.regionsLoaded.length; i++) {
             let regionInfo = imageInfo.regionsLoaded[i];
             let curve0 = imageInfo.curves[0];

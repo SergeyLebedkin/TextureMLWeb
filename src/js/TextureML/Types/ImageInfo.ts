@@ -70,7 +70,6 @@ export class ImageInfo {
         this.baseName = this.fileRef.name.split('.').slice(0, -1).join('.');
         this.minHeight = parseFloat(this.baseName.split('-')[0]);
         this.maxHeight = parseFloat(this.baseName.split('-')[1]);
-        console.log(this.minHeight, this.maxHeight);
         // read file
         var fileReader = new FileReader();
         fileReader.onload = event => {
