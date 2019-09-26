@@ -6,6 +6,9 @@ export class ImageInfo {
     // file reference
     public fileRef: File = null;
     public baseName: String = null;
+    // propertis
+    public minHeight: number = null;
+    public maxHeight: number = null;
     // canvases
     public canvasImage: HTMLCanvasElement = null;
     public canvasImageJet: HTMLCanvasElement = null;
@@ -21,6 +24,9 @@ export class ImageInfo {
     constructor() {
         // file reference
         this.fileRef = null;
+        // propertis
+        this.minHeight = 0;
+        this.maxHeight = 0;
         // canvases
         this.canvasImage = document.createElement("canvas");
         this.canvasImageJet = document.createElement("canvas");
@@ -62,6 +68,9 @@ export class ImageInfo {
         // store name
         this.fileRef = file;
         this.baseName = this.fileRef.name.split('.').slice(0, -1).join('.');
+        this.minHeight = parseFloat(this.baseName.split('-')[0]);
+        this.maxHeight = parseFloat(this.baseName.split('-')[1]);
+        console.log(this.minHeight, this.maxHeight);
         // read file
         var fileReader = new FileReader();
         fileReader.onload = event => {

@@ -202,17 +202,22 @@ function buttonSubmitOnClick(event) {
 function buttonSaveOnClick(event: MouseEvent) {
     var regionsString = '';
     for (let imageInfo of gImageInfoList) {
-        for (let regionInfo of imageInfo.regionsLoaded) {
+        let step = (imageInfo.maxHeight - imageInfo.minHeight) / imageInfo.regionsLoaded.length;
+        for (let i = 0; i < imageInfo.regionsLoaded.length; i++) {
+            let regionInfo = imageInfo.regionsLoaded[i];
+            let curve0 = imageInfo.curves[0];
+            let curve1 = imageInfo.curves[1];
+            let curve2 = imageInfo.curves[2];
             regionsString +=
                 imageInfo.fileRef.name + ", " +
-                regionInfo.x + ", " +
                 regionInfo.y + ", " +
-                "1, " +
-                (regionInfo.x + regionInfo.w) + ", " +
                 (regionInfo.y + regionInfo.h) + ", " +
-                "1, " +
                 regionInfo.ID + ", " +
-                gTextureIDList.find(textureID => textureID.ID === regionInfo.ID).name + "\r\n";
+                gTextureIDList.find(textureID => textureID.ID === regionInfo.ID).name + ", " +
+                curve0.points[i].x + ", " +
+                curve1.points[i].x + ", " +
+                curve2.points[i].x + ", " +
+                (imageInfo.minHeight + step*i) + "\r\n";
             ;
         }
     }
