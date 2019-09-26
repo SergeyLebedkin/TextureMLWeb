@@ -202,12 +202,18 @@ function buttonSubmitOnClick(event) {
 function buttonSaveOnClick(event: MouseEvent) {
     var regionsString = '';
     for (let imageInfo of gImageInfoList) {
-        let step = (imageInfo.maxHeight - imageInfo.minHeight) / (imageInfo.regionsLoaded.length - 1);
+        // get curves
+        let curve0 = imageInfo.curves[0];
+        let curve1 = imageInfo.curves[1];
+        let curve2 = imageInfo.curves[2];
+        // get properties
+        let lastRegion = imageInfo.regionsLoaded[imageInfo.regionsLoaded.length - 1];
+        let imageHeight = lastRegion.y + lastRegion.h;
+        let imageDepth = imageInfo.maxHeight - imageInfo.minHeight;
         for (let i = 0; i < imageInfo.regionsLoaded.length; i++) {
             let regionInfo = imageInfo.regionsLoaded[i];
-            let curve0 = imageInfo.curves[0];
-            let curve1 = imageInfo.curves[1];
-            let curve2 = imageInfo.curves[2];
+            let regionDepth = (regionInfo.y + regionInfo.h / 2);
+            let curveDepth = regionDepth/imageHeight*imageDepth + imageInfo.minHeight;
             regionsString +=
                 imageInfo.fileRef.name + ", " +
                 regionInfo.y + ", " +
@@ -217,7 +223,7 @@ function buttonSaveOnClick(event: MouseEvent) {
                 curve0.points[i].x + ", " +
                 curve1.points[i].x + ", " +
                 curve2.points[i].x + ", " +
-                (imageInfo.minHeight + step*i) + "\r\n";
+                curveDepth + "\r\n";
             ;
         }
     }
